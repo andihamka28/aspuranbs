@@ -1,1031 +1,1382 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Pondok Pesantren</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-  
-  body {
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    padding:20px;
-    overflow-x:hidden;
-  }
-  
-  /* Ornamen background */
-  body::before {
-    content:'';
-    position:fixed;
-    width:600px; height:600px;
-    background:radial-gradient(circle,rgba(16,185,129,0.25),transparent 70%);
-    top:-200px; left:-200px;
-    border-radius:50%;
-    animation:float 8s ease-in-out infinite;
-  }
-  body::after {
-    content:'';
-    position:fixed;
-    width:500px; height:500px;
-    background:radial-gradient(circle,rgba(59,130,246,0.25),transparent 70%);
-    bottom:-200px; right:-200px;
-    border-radius:50%;
-    animation:float 10s ease-in-out infinite reverse;
-  }
-  @keyframes float {
-    0%,100%{ transform:translate(0,0); }
-    50%{ transform:translate(30px,30px); }
-  }
-
-  .login-container {
-    position:relative;
-    width:100%;
-    max-width:950px;
-    background:rgba(255,255,255,0.08);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:24px;
-    box-shadow:0 25px 60px rgba(0,0,0,0.5);
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    overflow:hidden;
-    z-index:1;
-    animation:slideUp .6s ease;
-  }
-  @keyframes slideUp {
-    from { opacity:0; transform:translateY(30px); }
-    to { opacity:1; transform:translateY(0); }
-  }
-
-  /* ============ SISI KIRI (BRANDING) ============ */
-  .brand-side {
-    background:linear-gradient(160deg,#059669,#065f46 60%,#064e3b);
-    padding:50px 40px;
-    color:#fff;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    position:relative;
-    overflow:hidden;
-  }
-  .brand-side::before {
-    content:'';
-    position:absolute;
-    width:300px; height:300px;
-    background:rgba(255,255,255,0.08);
-    border-radius:50%;
-    bottom:-120px; right:-120px;
-  }
-  .brand-side::after {
-    content:'';
-    position:absolute;
-    width:180px; height:180px;
-    background:rgba(255,255,255,0.06);
-    border-radius:50%;
-    top:-60px; left:-60px;
-  }
-  .brand-logo {
-    width:70px; height:70px;
-    background:rgba(255,255,255,0.15);
-    border:2px solid rgba(255,255,255,0.3);
-    border-radius:20px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:32px;
-    margin-bottom:24px;
-  }
-  .brand-side h1 {
-    font-size:28px;
-    font-weight:700;
-    margin-bottom:10px;
-    line-height:1.3;
-  }
-  .brand-side p {
-    font-size:14px;
-    opacity:.85;
-    line-height:1.7;
-    margin-bottom:30px;
-  }
-  .feature-list { list-style:none; }
-  .feature-list li {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:14px;
-    font-size:14px;
-    opacity:.9;
-  }
-  .feature-list li i {
-    width:32px; height:32px;
-    background:rgba(255,255,255,0.15);
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:13px;
-  }
-
-  /* ============ SISI KANAN (FORM) ============ */
-  .form-side {
-    padding:50px 45px;
-    background:rgba(255,255,255,0.97);
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-  }
-  .form-side h2 {
-    font-size:24px;
-    color:#0f172a;
-    margin-bottom:6px;
-    font-weight:700;
-  }
-  .form-side .subtitle {
-    font-size:13px;
-    color:#64748b;
-    margin-bottom:28px;
-  }
-
-  /* Tab switcher */
-  .role-tabs {
-    display:flex;
-    background:#f1f5f9;
-    border-radius:12px;
-    padding:5px;
-    margin-bottom:24px;
-    gap:5px;
-  }
-  .role-tab {
-    flex:1;
-    padding:11px;
-    text-align:center;
-    border-radius:9px;
-    cursor:pointer;
-    font-size:13px;
-    font-weight:600;
-    color:#64748b;
-    transition:all .3s;
-    border:none;
-    background:transparent;
-    font-family:inherit;
-  }
-  .role-tab i { margin-right:6px; }
-  .role-tab.active {
-    background:#fff;
-    color:#059669;
-    box-shadow:0 4px 12px rgba(0,0,0,0.08);
-  }
-  .role-tab.active.admin-active { color:#2563eb; }
-
-  /* Input */
-  .input-group {
-    position:relative;
-    margin-bottom:16px;
-  }
-  .input-group i.field-icon {
-    position:absolute;
-    left:16px;
-    top:50%;
-    transform:translateY(-50%);
-    color:#94a3b8;
-    font-size:15px;
-    transition:color .3s;
-  }
-  .input-group input {
-    width:100%;
-    padding:14px 16px 14px 46px;
-    border:2px solid #e2e8f0;
-    border-radius:12px;
-    font-size:14px;
-    font-family:inherit;
-    background:#f8fafc;
-    color:#0f172a;
-    transition:all .3s;
-    outline:none;
-  }
-  .input-group input:focus {
-    border-color:#059669;
-    background:#fff;
-    box-shadow:0 0 0 4px rgba(5,150,105,0.1);
-  }
-  .input-group input:focus ~ i.field-icon { color:#059669; }
-  .input-group.admin-mode input:focus {
-    border-color:#2563eb;
-    box-shadow:0 0 0 4px rgba(37,99,235,0.1);
-  }
-  .input-group.admin-mode input:focus ~ i.field-icon { color:#2563eb; }
-
-  .toggle-pass {
-    position:absolute;
-    right:16px;
-    top:50%;
-    transform:translateY(-50%);
-    cursor:pointer;
-    color:#94a3b8;
-    font-size:15px;
-    transition:color .3s;
-  }
-  .toggle-pass:hover { color:#475569; }
-
-  .btn-login {
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    background:linear-gradient(135deg,#059669,#047857);
-    color:#fff;
-    font-size:15px;
-    font-weight:600;
-    font-family:inherit;
-    cursor:pointer;
-    transition:all .3s;
-    margin-top:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    box-shadow:0 8px 20px rgba(5,150,105,0.35);
-  }
-  .btn-login:hover {
-    transform:translateY(-2px);
-    box-shadow:0 12px 25px rgba(5,150,105,0.45);
-  }
-  .btn-login:active { transform:translateY(0); }
-  .btn-login.admin-btn {
-    background:linear-gradient(135deg,#2563eb,#1d4ed8);
-    box-shadow:0 8px 20px rgba(37,99,235,0.35);
-  }
-  .btn-login.admin-btn:hover {
-    box-shadow:0 12px 25px rgba(37,99,235,0.45);
-  }
-
-  .form-footer {
-    text-align:center;
-    margin-top:20px;
-    font-size:12px;
-    color:#94a3b8;
-  }
-
-  /* Alert */
-  .alert {
-    padding:12px 16px;
-    border-radius:10px;
-    font-size:13px;
-    margin-bottom:16px;
-    display:none;
-    align-items:center;
-    gap:10px;
-  }
-  .alert.show { display:flex; animation:shake .4s; }
-  .alert.error {
-    background:#fef2f2;
-    color:#dc2626;
-    border:1px solid #fecaca;
-  }
-  .alert.success {
-    background:#f0fdf4;
-    color:#16a34a;
-    border:1px solid #bbf7d0;
-  }
-  @keyframes shake {
-    0%,100%{ transform:translateX(0); }
-    25%{ transform:translateX(-6px); }
-    75%{ transform:translateX(6px); }
-  }
-
-  /* ============ DASHBOARD ADMIN ============ */
-  .dashboard {
-    position:fixed;
-    inset:0;
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    z-index:100;
-    display:none;
-    overflow-y:auto;
-    padding:30px 20px;
-  }
-  .dashboard.show { display:block; }
-  .dash-container {
-    max-width:1000px;
-    margin:0 auto;
-    animation:slideUp .5s ease;
-  }
-  .dash-header {
-    background:rgba(255,255,255,0.05);
-    backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:20px;
-    padding:24px 28px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:24px;
-    flex-wrap:wrap;
-    gap:16px;
-  }
-  .dash-header h2 {
-    color:#fff;
-    font-size:20px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
-  .dash-header h2 i { color:#3b82f6; }
-  .dash-header .user-info {
-    color:#94a3b8;
-    font-size:13px;
-  }
-  .dash-header .user-info strong { color:#fff; }
-  .btn-logout {
-    padding:10px 20px;
-    border:1px solid rgba(239,68,68,0.4);
-    background:rgba(239,68,68,0.1);
-    color:#f87171;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:13px;
-    font-family:inherit;
-    font-weight:500;
-    transition:all .3s;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .btn-logout:hover {
-    background:rgba(239,68,68,0.2);
-    border-color:#ef4444;
-  }
-
-  .stats-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:16px;
-    margin-bottom:24px;
-  }
-  .stat-card {
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:16px;
-    padding:20px;
-    display:flex;
-    align-items:center;
-    gap:16px;
-    transition:all .3s;
-  }
-  .stat-card:hover {
-    background:rgba(255,255,255,0.08);
-    transform:translateY(-3px);
-  }
-  .stat-icon {
-    width:50px; height:50px;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:20px;
-    color:#fff;
-  }
-  .stat-icon.blue { background:linear-gradient(135deg,#3b82f6,#1d4ed8); }
-  .stat-icon.green { background:linear-gradient(135deg,#10b981,#047857); }
-  .stat-icon.purple { background:linear-gradient(135deg,#8b5cf6,#6d28d9); }
-  .stat-info h3 { color:#fff; font-size:22px; font-weight:700; }
-  .stat-info p { color:#94a3b8; font-size:12px; }
-
-  .panel {
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:20px;
-    padding:24px 28px;
-    margin-bottom:24px;
-  }
-  .panel h3 {
-    color:#fff;
-    font-size:16px;
-    margin-bottom:20px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-  .panel h3 i { color:#3b82f6; }
-
-  .form-row {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
-    margin-bottom:14px;
-  }
-  @media(max-width:600px){ .form-row { grid-template-columns:1fr; } }
-
-  .panel input, .panel select {
-    width:100%;
-    padding:12px 16px;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:10px;
-    color:#fff;
-    font-size:14px;
-    font-family:inherit;
-    outline:none;
-    transition:all .3s;
-  }
-  .panel input::placeholder { color:#64748b; }
-  .panel input:focus, .panel select:focus {
-    border-color:#3b82f6;
-    background:rgba(59,130,246,0.1);
-  }
-  .panel select option { background:#1e293b; color:#fff; }
-
-  .btn-primary {
-    padding:12px 24px;
-    background:linear-gradient(135deg,#3b82f6,#1d4ed8);
-    border:none;
-    border-radius:10px;
-    color:#fff;
-    font-size:14px;
-    font-weight:600;
-    font-family:inherit;
-    cursor:pointer;
-    transition:all .3s;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-  }
-  .btn-primary:hover {
-    transform:translateY(-2px);
-    box-shadow:0 8px 20px rgba(59,130,246,0.4);
-  }
-
-  .table-wrap { overflow-x:auto; }
-  table {
-    width:100%;
-    border-collapse:collapse;
-    font-size:13px;
-  }
-  thead th {
-    text-align:left;
-    padding:12px 14px;
-    color:#94a3b8;
-    font-weight:500;
-    font-size:12px;
-    text-transform:uppercase;
-    letter-spacing:.5px;
-    border-bottom:1px solid rgba(255,255,255,0.1);
-  }
-  tbody td {
-    padding:14px;
-    color:#e2e8f0;
-    border-bottom:1px solid rgba(255,255,255,0.05);
-  }
-  tbody tr:hover { background:rgba(255,255,255,0.03); }
-  .badge {
-    display:inline-block;
-    padding:4px 10px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:600;
-  }
-  .badge.admin { background:rgba(59,130,246,0.2); color:#60a5fa; }
-  .badge.santri { background:rgba(16,185,129,0.2); color:#34d399; }
-
-  .action-btn {
-    padding:6px 10px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:12px;
-    margin-right:6px;
-    transition:all .3s;
-    font-family:inherit;
-  }
-  .action-btn.edit { background:rgba(59,130,246,0.2); color:#60a5fa; }
-  .action-btn.edit:hover { background:rgba(59,130,246,0.35); }
-  .action-btn.del { background:rgba(239,68,68,0.2); color:#f87171; }
-  .action-btn.del:hover { background:rgba(239,68,68,0.35); }
-
-  /* Modal */
-  .modal-overlay {
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.7);
-    backdrop-filter:blur(4px);
-    z-index:200;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  }
-  .modal-overlay.show { display:flex; }
-  .modal {
-    background:#1e293b;
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:20px;
-    padding:28px;
-    max-width:420px;
-    width:100%;
-    animation:slideUp .3s ease;
-  }
-  .modal h3 { color:#fff; margin-bottom:20px; font-size:18px; }
-  .modal .form-group { margin-bottom:16px; }
-  .modal label {
-    display:block;
-    color:#94a3b8;
-    font-size:12px;
-    margin-bottom:6px;
-  }
-  .modal input {
-    width:100%;
-    padding:12px 16px;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:10px;
-    color:#fff;
-    font-size:14px;
-    font-family:inherit;
-    outline:none;
-  }
-  .modal input:focus { border-color:#3b82f6; }
-  .modal-actions {
-    display:flex;
-    gap:10px;
-    margin-top:20px;
-  }
-  .btn-cancel {
-    flex:1;
-    padding:12px;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:10px;
-    color:#94a3b8;
-    font-family:inherit;
-    font-size:14px;
-    cursor:pointer;
-    transition:all .3s;
-  }
-  .btn-cancel:hover { background:rgba(255,255,255,0.1); color:#fff; }
-  .btn-save {
-    flex:1;
-    padding:12px;
-    background:linear-gradient(135deg,#3b82f6,#1d4ed8);
-    border:none;
-    border-radius:10px;
-    color:#fff;
-    font-family:inherit;
-    font-size:14px;
-    font-weight:600;
-    cursor:pointer;
-    transition:all .3s;
-  }
-  .btn-save:hover { transform:translateY(-2px); }
-
-  .toast {
-    position:fixed;
-    bottom:30px;
-    right:30px;
-    background:#1e293b;
-    border:1px solid rgba(255,255,255,0.1);
-    border-left:4px solid #10b981;
-    color:#fff;
-    padding:16px 22px;
-    border-radius:12px;
-    font-size:14px;
-    z-index:300;
-    transform:translateX(400px);
-    transition:transform .4s;
-    box-shadow:0 10px 30px rgba(0,0,0,0.5);
-  }
-  .toast.show { transform:translateX(0); }
-  .toast.error { border-left-color:#ef4444; }
-
-  /* Responsive */
-  @media(max-width:768px){
-    .login-container { grid-template-columns:1fr; max-width:420px; }
-    .brand-side { padding:35px 30px; }
-    .brand-side h1 { font-size:22px; }
-    .feature-list { display:none; }
-    .form-side { padding:35px 28px; }
-  }
-</style>
-</head>
-<body>
-
-<!-- ============ HALAMAN LOGIN ============ -->
-<div class="login-container" id="loginPage">
-  <!-- Sisi Kiri: Branding -->
-  <div class="brand-side">
-    <div class="brand-logo">🕌</div>
-    <h1>Pondok Pesantren<br>Al-Hikmah</h1>
-    <p>Sistem Informasi Manajemen Santri terpadu untuk mengelola data, kegiatan, dan administrasi pondok.</p>
-    <ul class="feature-list">
-      <li><i class="fas fa-shield-halved"></i> Keamanan data terjamin</li>
-      <li><i class="fas fa-users"></i> Manajemen santri & admin</li>
-      <li><i class="fas fa-chart-line"></i> Monitoring aktivitas real-time</li>
-    </ul>
-  </div>
-
-  <!-- Sisi Kanan: Form -->
-  <div class="form-side">
-    <h2 id="formTitle">Selamat Datang</h2>
-    <p class="subtitle" id="formSubtitle">Silakan login untuk melanjutkan</p>
-
-    <!-- Tab Pilih Role -->
-    <div class="role-tabs">
-      <button class="role-tab active" id="tabSantri" onclick="switchRole('santri')">
-        <i class="fas fa-user-graduate"></i> Santri
-      </button>
-      <button class="role-tab" id="tabAdmin" onclick="switchRole('admin')">
-        <i class="fas fa-user-shield"></i> Admin
-      </button>
-    </div>
-
-    <!-- Alert -->
-    <div class="alert error" id="alertBox">
-      <i class="fas fa-circle-exclamation"></i>
-      <span id="alertMsg">Username atau password salah!</span>
-    </div>
-
-    <!-- Form Login -->
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="input-group" id="igUser">
-        <i class="fas fa-user field-icon"></i>
-        <input type="text" id="username" placeholder="Username" autocomplete="off" required>
-      </div>
-      <div class="input-group" id="igPass">
-        <i class="fas fa-lock field-icon"></i>
-        <input type="password" id="password" placeholder="Password" required>
-        <i class="fas fa-eye toggle-pass" onclick="togglePassword(this)"></i>
-      </div>
-      <button type="submit" class="btn-login" id="btnLogin">
-        <i class="fas fa-right-to-bracket"></i> Login sebagai Santri
-      </button>
-    </form>
-
-    <p class="form-footer">© 2024 Pondok Pesantren Al-Hikmah. All rights reserved.</p>
-  </div>
-</div>
-
-<!-- ============ DASHBOARD ADMIN ============ -->
-<div class="dashboard" id="dashboard">
-  <div class="dash-container">
-    <!-- Header -->
-    <div class="dash-header">
-      <div>
-        <h2><i class="fas fa-gauge-high"></i> Dashboard Admin</h2>
-        <p class="user-info" style="margin-top:6px;">Masuk sebagai <strong id="adminName">admin</strong></p>
-      </div>
-      <button class="btn-logout" onclick="logout()">
-        <i class="fas fa-right-from-bracket"></i> Logout
-      </button>
-    </div>
-
-    <!-- Statistik -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon blue"><i class="fas fa-user-shield"></i></div>
-        <div class="stat-info"><h3 id="statAdmin">0</h3><p>Total Admin</p></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon green"><i class="fas fa-user-graduate"></i></div>
-        <div class="stat-info"><h3 id="statSantri">0</h3><p>Total Santri</p></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple"><i class="fas fa-users"></i></div>
-        <div class="stat-info"><h3 id="statTotal">0</h3><p>Semua Pengguna</p></div>
-      </div>
-    </div>
-
-    <!-- Form Tambah User -->
-    <div class="panel">
-      <h3><i class="fas fa-user-plus"></i> Tambah Pengguna Baru</h3>
-      <div class="form-row">
-        <input type="text" id="newUsername" placeholder="Username baru" autocomplete="off">
-        <input type="text" id="newPassword" placeholder="Password" autocomplete="off">
-      </div>
-      <div class="form-row">
-        <select id="newRole">
-          <option value="santri">Santri</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button class="btn-primary" onclick="addUser()" style="width:100%;justify-content:center;">
-          <i class="fas fa-plus"></i> Tambah Pengguna
-        </button>
-      </div>
-    </div>
-
-    <!-- Tabel Pengguna -->
-    <div class="panel">
-      <h3><i class="fas fa-table-list"></i> Daftar Pengguna</h3>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Username</th>
-              <th>Password</th>
-              <th>Role</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="userTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ MODAL EDIT ============ -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <h3><i class="fas fa-pen-to-square"></i> Edit Pengguna</h3>
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" id="editUsername">
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="text" id="editPassword">
-    </div>
-    <div class="form-group">
-      <label>Role</label>
-      <select id="editRole" style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-family:inherit;font-size:14px;outline:none;">
-        <option value="santri">Santri</option>
-        <option value="admin">Admin</option>
-      </select>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Batal</button>
-      <button class="btn-save" onclick="saveEdit()">Simpan</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
 <script>
-/* ================= DATA PENGGUNA (simulasi database) ================= */
-let users = [
-  { username:'admin',    password:'admin123',    role:'admin'  },
-  { username:'santri1',  password:'santri123',   role:'santri' },
-  { username:'santri2',  password:'santri123',   role:'santri' },
-];
+/* ============================================================
+   🔥 FIREBASE CONFIG
+============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCyHMJOBZTaEXJCmZGneSblpi3GSu9mYUE",
+  authDomain: "asrama-putra-850d5.firebaseapp.com",
+  projectId: "asrama-putra-850d5",
+  storageBucket: "asrama-putra-850d5.firebasestorage.app",
+  messagingSenderId: "904746451509",
+  appId: "1:904746451509:web:1fd0fcb9db58667953e77c"
+};
 
-let currentRole = 'santri';
-let editIndex = -1;
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-/* ================= SIMPAN / LOAD DARI LOCALSTORAGE ================= */
-function saveUsers() {
-  localStorage.setItem('pp_users', JSON.stringify(users));
+/* ============================================================
+   💾 DATA LAYER — Firestore + Local Cache
+============================================================ */
+let currentUser = null;
+let unsubscribeListeners = [];
+
+// Data lokal (untuk render cepat)
+let santriList = [];
+let transaksiList = [];
+let kegiatanList = [];
+let pengumumanList = [];
+let pengaturan = {
+  namaPesantren: 'Pesantren Al-Hikmah',
+  alamat: '',
+  pengasuh: '',
+  bendahara: ''
+};
+
+// Helper: doc reference (dengan UID user sebagai namespace)
+function userDoc(coll) {
+  return db.collection('users').doc(currentUser.uid).collection(coll);
 }
-function loadUsers() {
-  const data = localStorage.getItem('pp_users');
-  if (data) users = JSON.parse(data);
+function userMeta() {
+  return db.collection('users').doc(currentUser.uid);
 }
-loadUsers();
 
-/* ================= SWITCH ROLE (Tab) ================= */
-function switchRole(role) {
-  currentRole = role;
-  const tabSantri = document.getElementById('tabSantri');
-  const tabAdmin  = document.getElementById('tabAdmin');
-  const btnLogin  = document.getElementById('btnLogin');
-  const igUser    = document.getElementById('igUser');
-  const igPass    = document.getElementById('igPass');
-  const title     = document.getElementById('formTitle');
-  const subtitle  = document.getElementById('formSubtitle');
-
-  hideAlert();
-
-  if (role === 'admin') {
-    tabAdmin.classList.add('active','admin-active');
-    tabSantri.classList.remove('active','admin-active');
-    btnLogin.innerHTML = '<i class="fas fa-user-shield"></i> Login sebagai Admin';
-    btnLogin.classList.add('admin-btn');
-    igUser.classList.add('admin-mode');
-    igPass.classList.add('admin-mode');
-    title.textContent = 'Panel Admin';
-    subtitle.textContent = 'Masuk untuk mengelola sistem';
-    document.getElementById('username').placeholder = 'Username Admin';
+/* ============================================================
+   🔐 AUTHENTICATION
+============================================================ */
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('loginScreen').classList.add('hide');
+    document.getElementById('app').style.display = 'flex';
+    await initApp();
   } else {
-    tabSantri.classList.add('active');
-    tabSantri.classList.remove('admin-active');
-    tabAdmin.classList.remove('active','admin-active');
-    btnLogin.innerHTML = '<i class="fas fa-right-to-bracket"></i> Login sebagai Santri';
-    btnLogin.classList.remove('admin-btn');
-    igUser.classList.remove('admin-mode');
-    igPass.classList.remove('admin-mode');
-    title.textContent = 'Selamat Datang';
-    subtitle.textContent = 'Silakan login untuk melanjutkan';
-    document.getElementById('username').placeholder = 'Username Santri';
+    currentUser = null;
+    cleanupListeners();
+    document.getElementById('loginScreen').classList.remove('hide');
+    document.getElementById('app').style.display = 'none';
+    setTimeout(() => document.getElementById('loginEmail')?.focus(), 400);
   }
-  document.getElementById('username').value = '';
-  document.getElementById('password').value = '';
-}
-
-/* ================= TOGGLE PASSWORD ================= */
-function togglePassword(el) {
-  const input = el.previousElementSibling;
-  if (input.type === 'password') {
-    input.type = 'text';
-    el.classList.remove('fa-eye');
-    el.classList.add('fa-eye-slash');
-  } else {
-    input.type = 'password';
-    el.classList.remove('fa-eye-slash');
-    el.classList.add('fa-eye');
-  }
-}
-
-/* ================= ALERT ================= */
-function showAlert(msg, type='error') {
-  const box = document.getElementById('alertBox');
-  box.className = 'alert ' + type + ' show';
-  document.getElementById('alertMsg').textContent = msg;
-  setTimeout(hideAlert, 4000);
-}
-function hideAlert() {
-  document.getElementById('alertBox').classList.remove('show');
-}
-
-/* ================= TOAST ================= */
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type === 'error' ? ' error' : '');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-/* ================= HANDLE LOGIN ================= */
-function handleLogin(e) {
-  e.preventDefault();
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value;
-
-  const user = users.find(u => u.username === username && u.password === password);
-
-  if (!user) {
-    showAlert('Username atau password salah!');
-    return;
-  }
-  if (user.role !== currentRole) {
-    showAlert(`Akun ini bukan akun ${currentRole}! Silakan pilih tab yang sesuai.`);
-    return;
-  }
-
-  // Login sukses
-  if (user.role === 'admin') {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('dashboard').classList.add('show');
-    document.getElementById('adminName').textContent = user.username;
-    renderUsers();
-    showToast('Login berhasil! Selamat datang, ' + user.username);
-  } else {
-    showToast('Login berhasil! Selamat datang, ' + user.username);
-    showAlert('Login santri berhasil! (Halaman santri belum tersedia)', 'success');
-  }
-}
-
-/* ================= LOGOUT ================= */
-function logout() {
-  document.getElementById('dashboard').classList.remove('show');
-  document.getElementById('loginPage').style.display = 'grid';
-  document.getElementById('username').value = '';
-  document.getElementById('password').value = '';
-  hideAlert();
-  showToast('Anda telah logout');
-}
-
-/* ================= RENDER TABEL USER ================= */
-function renderUsers() {
-  const tbody = document.getElementById('userTable');
-  tbody.innerHTML = '';
-
-  users.forEach((u, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${i + 1}</td>
-      <td><strong>${u.username}</strong></td>
-      <td>${'•'.repeat(u.password.length)}</td>
-      <td><span class="badge ${u.role}">${u.role}</span></td>
-      <td>
-        <button class="action-btn edit" onclick="openEdit(${i})"><i class="fas fa-pen"></i> Edit</button>
-        <button class="action-btn del" onclick="deleteUser(${i})"><i class="fas fa-trash"></i> Hapus</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  updateStats();
-}
-
-/* ================= STATISTIK ================= */
-function updateStats() {
-  const total  = users.length;
-  const admin  = users.filter(u => u.role === 'admin').length;
-  const santri = users.filter(u => u.role === 'santri').length;
-  document.getElementById('statTotal').textContent  = total;
-  document.getElementById('statAdmin').textContent  = admin;
-  document.getElementById('statSantri').textContent = santri;
-}
-
-/* ================= TAMBAH USER ================= */
-function addUser() {
-  const username = document.getElementById('newUsername').value.trim();
-  const password = document.getElementById('newPassword').value.trim();
-  const role     = document.getElementById('newRole').value;
-
-  if (!username || !password) {
-    showToast('Username dan password wajib diisi!', 'error');
-    return;
-  }
-  if (password.length < 4) {
-    showToast('Password minimal 4 karakter!', 'error');
-    return;
-  }
-  if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-    showToast('Username sudah digunakan!', 'error');
-    return;
-  }
-
-  users.push({ username, password, role });
-  saveUsers();
-  renderUsers();
-
-  document.getElementById('newUsername').value = '';
-  document.getElementById('newPassword').value = '';
-  document.getElementById('newRole').value = 'santri';
-
-  showToast(`Pengguna "${username}" berhasil ditambahkan!`);
-}
-
-/* ================= HAPUS USER ================= */
-function deleteUser(index) {
-  if (users[index].username === 'admin' && users.filter(u => u.role === 'admin').length === 1) {
-    showToast('Tidak bisa menghapus admin terakhir!', 'error');
-    return;
-  }
-  if (!confirm(`Hapus pengguna "${users[index].username}"?`)) return;
-
-  const name = users[index].username;
-  users.splice(index, 1);
-  saveUsers();
-  renderUsers();
-  showToast(`Pengguna "${name}" dihapus`);
-}
-
-/* ================= MODAL EDIT ================= */
-function openEdit(index) {
-  editIndex = index;
-  document.getElementById('editUsername').value = users[index].username;
-  document.getElementById('editPassword').value = users[index].password;
-  document.getElementById('editRole').value     = users[index].role;
-  document.getElementById('editModal').classList.add('show');
-}
-function closeModal() {
-  document.getElementById('editModal').classList.remove('show');
-  editIndex = -1;
-}
-function saveEdit() {
-  const username = document.getElementById('editUsername').value.trim();
-  const password = document.getElementById('editPassword').value.trim();
-  const role     = document.getElementById('editRole').value;
-
-  if (!username || !password) {
-    showToast('Username dan password wajib diisi!', 'error');
-    return;
-  }
-  if (password.length < 4) {
-    showToast('Password minimal 4 karakter!', 'error');
-    return;
-  }
-  // cek duplikat (kecuali dirinya sendiri)
-  const dup = users.findIndex((u, i) => i !== editIndex && u.username.toLowerCase() === username.toLowerCase());
-  if (dup !== -1) {
-    showToast('Username sudah digunakan!', 'error');
-    return;
-  }
-  // cek admin terakhir
-  if (users[editIndex].role === 'admin' && role !== 'admin' && users.filter(u => u.role === 'admin').length === 1) {
-    showToast('Tidak bisa mengubah admin terakhir menjadi santri!', 'error');
-    return;
-  }
-
-  users[editIndex] = { username, password, role };
-  saveUsers();
-  renderUsers();
-  closeModal();
-  showToast('Perubahan berhasil disimpan!');
-}
-
-/* Tutup modal jika klik overlay */
-document.getElementById('editModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
 });
+
+function cleanupListeners() {
+  unsubscribeListeners.forEach(fn => { try { fn(); } catch(e) {} });
+  unsubscribeListeners = [];
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const remember = document.getElementById('loginRemember').checked;
+  const btn = document.getElementById('btnLogin');
+  const btnText = document.getElementById('btnLoginText');
+  const alertEl = document.getElementById('loginAlert');
+  const pwdInput = document.getElementById('loginPassword');
+  
+  alertEl.classList.remove('show');
+  pwdInput.classList.remove('error');
+  
+  if (!email || !password) {
+    showLoginAlert('Email dan password wajib diisi!', 'error');
+    return;
+  }
+  
+  btn.disabled = true;
+  btnText.innerHTML = '<div class="spinner"></div> Memverifikasi...';
+  
+  try {
+    // Set persistence sesuai "remember me"
+    const persistence = remember 
+      ? firebase.auth.Auth.Persistence.LOCAL 
+      : firebase.auth.Auth.Persistence.SESSION;
+    await auth.setPersistence(persistence);
+    
+    await auth.signInWithEmailAndPassword(email, password);
+    showLoginAlert('Login berhasil!', 'success');
+    btnText.innerHTML = '✅ Berhasil!';
+  } catch (err) {
+    console.error(err);
+    let msg = 'Email atau password salah!';
+    if (err.code === 'auth/invalid-email') msg = 'Format email tidak valid!';
+    else if (err.code === 'auth/user-not-found') msg = 'Akun tidak ditemukan!';
+    else if (err.code === 'auth/wrong-password') msg = 'Password salah!';
+    else if (err.code === 'auth/too-many-requests') msg = 'Terlalu banyak percobaan. Coba lagi nanti.';
+    else if (err.code === 'auth/network-request-failed') msg = 'Koneksi internet bermasalah!';
+    
+    showLoginAlert(msg, 'error');
+    pwdInput.classList.add('error');
+    setTimeout(() => pwdInput.classList.remove('error'), 500);
+    btn.disabled = false;
+    btnText.innerHTML = '🔓 Masuk';
+  }
+}
+
+function showLoginAlert(msg, type) {
+  const el = document.getElementById('loginAlert');
+  el.textContent = (type === 'error' ? '❌ ' : '✅ ') + msg;
+  el.className = 'login-alert ' + type + ' show';
+}
+
+async function handleLogout() {
+  if (!confirm('Yakin ingin logout?')) return;
+  try {
+    await auth.signOut();
+    showToast('Berhasil logout');
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal logout', 'error');
+  }
+}
+
+function togglePassword() {
+  const inp = document.getElementById('loginPassword');
+  const btn = document.getElementById('togglePassBtn');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+/* ============================================================
+   🔑 UBAH PASSWORD
+============================================================ */
+function openChangePassword() {
+  document.getElementById('changePwdModal').style.display = 'flex';
+  document.getElementById('pwdAlert').classList.remove('show');
+  document.getElementById('pwdLama').value = '';
+  document.getElementById('pwdBaru').value = '';
+  document.getElementById('pwdKonfirmasi').value = '';
+  document.getElementById('userDropdown').classList.remove('show');
+}
+
+function closeChangePassword() {
+  document.getElementById('changePwdModal').style.display = 'none';
+}
+
+async function submitChangePassword() {
+  const lama = document.getElementById('pwdLama').value;
+  const baru = document.getElementById('pwdBaru').value;
+  const konf = document.getElementById('pwdKonfirmasi').value;
+  const alertEl = document.getElementById('pwdAlert');
+  
+  alertEl.classList.remove('show');
+  
+  if (!lama || !baru || !konf) {
+    alertEl.textContent = '❌ Semua field wajib diisi!';
+    alertEl.className = 'login-alert error show';
+    return;
+  }
+  if (baru.length < 6) {
+    alertEl.textContent = '❌ Password baru minimal 6 karakter!';
+    alertEl.className = 'login-alert error show';
+    return;
+  }
+  if (baru !== konf) {
+    alertEl.textContent = '❌ Konfirmasi password tidak cocok!';
+    alertEl.className = 'login-alert error show';
+    return;
+  }
+  
+  try {
+    const cred = firebase.auth.EmailAuthProvider.credential(currentUser.email, lama);
+    await currentUser.reauthenticateWithCredential(cred);
+    await currentUser.updatePassword(baru);
+    closeChangePassword();
+    showToast('Password berhasil diubah!');
+  } catch (err) {
+    console.error(err);
+    let msg = 'Gagal mengubah password!';
+    if (err.code === 'auth/wrong-password') msg = 'Password lama salah!';
+    else if (err.code === 'auth/weak-password') msg = 'Password baru terlalu lemah!';
+    alertEl.textContent = '❌ ' + msg;
+    alertEl.className = 'login-alert error show';
+  }
+}
+
+/* ============================================================
+   🔥 INIT APP — Load data dari Firestore
+============================================================ */
+async function initApp() {
+  // Tampilkan info user
+  const email = currentUser.email || '';
+  const initial = email.charAt(0).toUpperCase();
+  document.getElementById('userAvatar').textContent = initial || 'BS';
+  document.getElementById('userNameDisplay').innerHTML = 
+    `${email.split('@')[0]}<small>Administrator</small>`;
+  document.getElementById('ddName').textContent = email.split('@')[0];
+  document.getElementById('ddRole').textContent = 'Administrator · ' + email;
+  
+  // Set listener realtime
+  setupRealtimeListeners();
+  
+  updateClock();
+}
+
+function setupRealtimeListeners() {
+  cleanupListeners();
+  
+  // PENGATURAN (document tunggal)
+  const unsubSettings = userMeta().onSnapshot(doc => {
+    if (doc.exists && doc.data().pengaturan) {
+      pengaturan = doc.data().pengaturan;
+    }
+    loadPengaturan();
+  }, err => console.error('pengaturan:', err));
+  unsubscribeListeners.push(unsubSettings);
+  
+  // SANTRI
+  const unsubSantri = userDoc('santri').onSnapshot(snap => {
+    santriList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    refreshAll();
+  }, err => { console.error('santri:', err); showToast('Gagal memuat santri', 'error'); });
+  unsubscribeListeners.push(unsubSantri);
+  
+  // TRANSAKSI
+  const unsubTrx = userDoc('transaksi').onSnapshot(snap => {
+    transaksiList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    refreshAll();
+  }, err => { console.error('transaksi:', err); showToast('Gagal memuat transaksi', 'error'); });
+  unsubscribeListeners.push(unsubTrx);
+  
+  // KEGIATAN
+  const unsubKeg = userDoc('kegiatan').onSnapshot(snap => {
+    kegiatanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderKegiatan();
+    renderDashboard();
+  }, err => console.error('kegiatan:', err));
+  unsubscribeListeners.push(unsubKeg);
+  
+  // PENGUMUMAN
+  const unsubPeng = userDoc('pengumuman').onSnapshot(snap => {
+    pengumumanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderPengumuman();
+    renderDashboard();
+    updateBadgePengumuman();
+  }, err => console.error('pengumuman:', err));
+  unsubscribeListeners.push(unsubPeng);
+}
+
+/* ============================================================
+   💾 SAVE HELPERS
+============================================================ */
+async function saveSantri(data, id = null) {
+  try {
+    if (id) {
+      await userDoc('santri').doc(id).update(data);
+    } else {
+      await userDoc('santri').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    }
+    return true;
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal menyimpan santri', 'error');
+    return false;
+  }
+}
+
+async function deleteSantri(id) {
+  try {
+    // Hapus santri
+    await userDoc('santri').doc(id).delete();
+    // Hapus semua transaksi terkait
+    const trxSnap = await userDoc('transaksi').where('santriId', '==', id).get();
+    const batch = db.batch();
+    trxSnap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    return true;
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal menghapus santri', 'error');
+    return false;
+  }
+}
+
+async function saveTransaksi(data) {
+  try {
+    await userDoc('transaksi').add({ 
+      ...data, 
+      createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+    });
+    return true;
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal menyimpan transaksi', 'error');
+    return false;
+  }
+}
+
+async function deleteTransaksi(id) {
+  try {
+    await userDoc('transaksi').doc(id).delete();
+    return true;
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal menghapus transaksi', 'error');
+    return false;
+  }
+}
+
+async function saveKegiatan(data, id = null) {
+  try {
+    if (id) await userDoc('kegiatan').doc(id).update(data);
+    else await userDoc('kegiatan').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    return true;
+  } catch (err) { console.error(err); showToast('Gagal menyimpan kegiatan', 'error'); return false; }
+}
+
+async function deleteKegiatan(id) {
+  try { await userDoc('kegiatan').doc(id).delete(); return true; }
+  catch (err) { console.error(err); showToast('Gagal menghapus kegiatan', 'error'); return false; }
+}
+
+async function savePengumuman(data, id = null) {
+  try {
+    if (id) await userDoc('pengumuman').doc(id).update(data);
+    else await userDoc('pengumuman').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    return true;
+  } catch (err) { console.error(err); showToast('Gagal menyimpan pengumuman', 'error'); return false; }
+}
+
+async function deletePengumuman(id) {
+  try { await userDoc('pengumuman').doc(id).delete(); return true; }
+  catch (err) { console.error(err); showToast('Gagal menghapus pengumuman', 'error'); return false; }
+}
+
+async function savePengaturan() {
+  try {
+    await userMeta().set({ pengaturan }, { merge: true });
+    return true;
+  } catch (err) { console.error(err); showToast('Gagal menyimpan pengaturan', 'error'); return false; }
+}
+
+/* ============================================================
+   🎨 UI HANDLERS — Santri
+============================================================ */
+async function simpanSantri() {
+  const id = document.getElementById('santriEditId').value;
+  const nama = document.getElementById('santriNama').value.trim();
+  const kamar = document.getElementById('santriKamar').value.trim();
+  const hp = document.getElementById('santriHP').value.trim();
+  const tgl = document.getElementById('santriTgl').value;
+  
+  if (!nama) { showToast('Nama santri wajib diisi!', 'error'); return; }
+  
+  const ok = await saveSantri({ nama, kamar, hp, tgl }, id || null);
+  if (ok) {
+    resetFormSantri();
+    showToast('Data santri berhasil disimpan!');
+  }
+}
+
+function editSantri(id) {
+  const s = santriList.find(x => x.id == id);
+  if (!s) return;
+  document.getElementById('santriEditId').value = s.id;
+  document.getElementById('santriNama').value = s.nama;
+  document.getElementById('santriKamar').value = s.kamar || '';
+  document.getElementById('santriHP').value = s.hp || '';
+  document.getElementById('santriTgl').value = s.tgl || '';
+  document.getElementById('formSantriTitle').textContent = '✏️ Edit Santri';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function hapusSantri(id) {
+  if (!confirm('Hapus santri ini? Semua transaksinya juga akan terhapus.')) return;
+  const ok = await deleteSantri(id);
+  if (ok) showToast('Santri berhasil dihapus');
+}
+
+function resetFormSantri() {
+  document.getElementById('santriEditId').value = '';
+  document.getElementById('santriNama').value = '';
+  document.getElementById('santriKamar').value = '';
+  document.getElementById('santriHP').value = '';
+  document.getElementById('santriTgl').value = today();
+  document.getElementById('formSantriTitle').textContent = '➕ Tambah Santri';
+}
+
+/* ============================================================
+   🎨 UI HANDLERS — Transaksi
+============================================================ */
+async function simpanSetoran() {
+  const santriId = document.getElementById('setorSantri').value;
+  const jumlah = parseInt(document.getElementById('setorJumlah').value);
+  const tanggal = document.getElementById('setorTanggal').value;
+  const kategori = document.getElementById('setorKategori').value;
+  const ket = document.getElementById('setorKet').value.trim();
+  
+  if (!santriId) { showToast('Pilih santri!', 'error'); return; }
+  if (!jumlah || jumlah <= 0) { showToast('Jumlah harus > 0!', 'error'); return; }
+  if (!tanggal) { showToast('Tanggal wajib diisi!', 'error'); return; }
+  
+  const ok = await saveTransaksi({ santriId, jenis: 'masuk', jumlah, tanggal, kategori, ket });
+  if (ok) {
+    document.getElementById('setorJumlah').value = '';
+    document.getElementById('setorKet').value = '';
+    showToast('Setoran berhasil disimpan!');
+  }
+}
+
+async function simpanPengeluaran() {
+  const santriId = document.getElementById('keluarSantri').value;
+  const jumlah = parseInt(document.getElementById('keluarJumlah').value);
+  const tanggal = document.getElementById('keluarTanggal').value;
+  const kategori = document.getElementById('keluarKategori').value;
+  const ket = document.getElementById('keluarKet').value.trim();
+  
+  if (!santriId) { showToast('Pilih santri!', 'error'); return; }
+  if (!jumlah || jumlah <= 0) { showToast('Jumlah harus > 0!', 'error'); return; }
+  if (!tanggal) { showToast('Tanggal wajib diisi!', 'error'); return; }
+  
+  const saldo = hitungSaldo(santriId);
+  if (jumlah > saldo && !confirm(`Saldo santri hanya ${rupiah(saldo)}. Lanjutkan?`)) return;
+  
+  const ok = await saveTransaksi({ santriId, jenis: 'keluar', jumlah, tanggal, kategori, ket });
+  if (ok) {
+    document.getElementById('keluarJumlah').value = '';
+    document.getElementById('keluarKet').value = '';
+    showToast('Pengeluaran berhasil disimpan!');
+  }
+}
+
+async function hapusTransaksi(id) {
+  if (!confirm('Hapus transaksi ini?')) return;
+  const ok = await deleteTransaksi(id);
+  if (ok) showToast('Transaksi dihapus');
+}
+
+/* ============================================================
+   🎨 UI HANDLERS — Kegiatan
+============================================================ */
+async function simpanKegiatan() {
+  const id = document.getElementById('kegiatanEditId').value;
+  const nama = document.getElementById('kegiatanNama').value.trim();
+  const tanggal = document.getElementById('kegiatanTanggal').value;
+  const waktu = document.getElementById('kegiatanWaktu').value;
+  const lokasi = document.getElementById('kegiatanLokasi').value.trim();
+  const desk = document.getElementById('kegiatanDesk').value.trim();
+  
+  if (!nama || !tanggal) { showToast('Nama dan tanggal wajib diisi!', 'error'); return; }
+  
+  const ok = await saveKegiatan({ nama, tanggal, waktu, lokasi, desk }, id || null);
+  if (ok) { resetFormKegiatan(); showToast('Kegiatan disimpan!'); }
+}
+
+function editKegiatan(id) {
+  const k = kegiatanList.find(x => x.id == id);
+  if (!k) return;
+  document.getElementById('kegiatanEditId').value = k.id;
+  document.getElementById('kegiatanNama').value = k.nama;
+  document.getElementById('kegiatanTanggal').value = k.tanggal;
+  document.getElementById('kegiatanWaktu').value = k.waktu || '';
+  document.getElementById('kegiatanLokasi').value = k.lokasi || '';
+  document.getElementById('kegiatanDesk').value = k.desk || '';
+  document.getElementById('formKegiatanTitle').textContent = '✏️ Edit Kegiatan';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function hapusKegiatan(id) {
+  if (!confirm('Hapus kegiatan ini?')) return;
+  const ok = await deleteKegiatan(id);
+  if (ok) showToast('Kegiatan dihapus');
+}
+
+function resetFormKegiatan() {
+  document.getElementById('kegiatanEditId').value = '';
+  document.getElementById('kegiatanNama').value = '';
+  document.getElementById('kegiatanTanggal').value = today();
+  document.getElementById('kegiatanWaktu').value = '';
+  document.getElementById('kegiatanLokasi').value = '';
+  document.getElementById('kegiatanDesk').value = '';
+  document.getElementById('formKegiatanTitle').textContent = '➕ Tambah Kegiatan';
+}
+
+/* ============================================================
+   🎨 UI HANDLERS — Pengumuman
+============================================================ */
+async function simpanPengumuman() {
+  const id = document.getElementById('pengEditId').value;
+  const judul = document.getElementById('pengJudul').value.trim();
+  const prioritas = document.getElementById('pengPrioritas').value;
+  const tanggal = document.getElementById('pengTanggal').value;
+  const isi = document.getElementById('pengIsi').value.trim();
+  
+  if (!judul || !isi) { showToast('Judul dan isi wajib diisi!', 'error'); return; }
+  
+  const ok = await savePengumuman({ judul, prioritas, tanggal: tanggal || today(), isi }, id || null);
+  if (ok) { resetFormPengumuman(); showToast('Pengumuman disimpan!'); }
+}
+
+function editPengumuman(id) {
+  const p = pengumumanList.find(x => x.id == id);
+  if (!p) return;
+  document.getElementById('pengEditId').value = p.id;
+  document.getElementById('pengJudul').value = p.judul;
+  document.getElementById('pengPrioritas').value = p.prioritas;
+  document.getElementById('pengTanggal').value = p.tanggal;
+  document.getElementById('pengIsi').value = p.isi;
+  document.getElementById('formPengTitle').textContent = '✏️ Edit Pengumuman';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function hapusPengumuman(id) {
+  if (!confirm('Hapus pengumuman ini?')) return;
+  const ok = await deletePengumuman(id);
+  if (ok) showToast('Pengumuman dihapus');
+}
+
+function resetFormPengumuman() {
+  document.getElementById('pengEditId').value = '';
+  document.getElementById('pengJudul').value = '';
+  document.getElementById('pengPrioritas').value = 'info';
+  document.getElementById('pengTanggal').value = today();
+  document.getElementById('pengIsi').value = '';
+  document.getElementById('formPengTitle').textContent = '➕ Tambah Pengumuman';
+}
+
+/* ============================================================
+   🎨 UI HANDLERS — Pengaturan
+============================================================ */
+async function simpanPengaturan() {
+  pengaturan.namaPesantren = document.getElementById('setNamaPesantren').value.trim();
+  pengaturan.alamat = document.getElementById('setAlamat').value.trim();
+  pengaturan.pengasuh = document.getElementById('setPengasuh').value.trim();
+  pengaturan.bendahara = document.getElementById('setBendahara').value.trim();
+  
+  const ok = await savePengaturan();
+  if (ok) {
+    document.getElementById('brandPesantren').textContent = pengaturan.namaPesantren || 'Finance System';
+    showToast('Pengaturan disimpan!');
+  }
+}
+
+function loadPengaturan() {
+  document.getElementById('setNamaPesantren').value = pengaturan.namaPesantren || '';
+  document.getElementById('setAlamat').value = pengaturan.alamat || '';
+  document.getElementById('setPengasuh').value = pengaturan.pengasuh || '';
+  document.getElementById('setBendahara').value = pengaturan.bendahara || '';
+  document.getElementById('brandPesantren').textContent = pengaturan.namaPesantren || 'Finance System';
+}
+
+/* ============================================================
+   💾 BACKUP & RESTORE (Firestore → JSON)
+============================================================ */
+async function backupData() {
+  const data = {
+    santriList, transaksiList, kegiatanList, pengumumanList, pengaturan,
+    exportedAt: new Date().toISOString(),
+    exportedBy: currentUser.email,
+    version: 6
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `backup-bank-santri-${today()}.json`;
+  a.click();
+  showToast('Backup berhasil didownload');
+}
+
+async function restoreData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!confirm('Restore akan MENIMPA data di Firestore. Lanjutkan?')) return;
+      
+      showToast('Sedang restore...', 'info');
+      
+      // Hapus data lama dulu
+      const collections = ['santri', 'transaksi', 'kegiatan', 'pengumuman'];
+      for (const coll of collections) {
+        const snap = await userDoc(coll).get();
+        const batch = db.batch();
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+      
+      // Upload data baru (batch write)
+      const uploads = [
+        { coll: 'santri', items: data.santriList || [], keepId: true },
+        { coll: 'transaksi', items: data.transaksiList || [], keepId: true },
+        { coll: 'kegiatan', items: data.kegiatanList || [], keepId: true },
+        { coll: 'pengumuman', items: data.pengumumanList || [], keepId: true }
+      ];
+      
+      for (const { coll, items } of uploads) {
+        for (const item of items) {
+          const { id, ...rest } = item;
+          await userDoc(coll).doc(String(id)).set(rest);
+        }
+      }
+      
+      if (data.pengaturan) {
+        pengaturan = data.pengaturan;
+        await savePengaturan();
+      }
+      
+      showToast('Data berhasil dipulihkan!');
+    } catch(err) {
+      console.error(err);
+      showToast('File tidak valid!', 'error');
+    }
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+}
+
+async function hapusSemuaData() {
+  if (!confirm('⚠️ SEMUA DATA AKAN DIHAPUS DARI FIRESTORE!\n\nLanjutkan?')) return;
+  if (!confirm('Yakin? Tindakan ini tidak dapat dibatalkan!')) return;
+  
+  try {
+    showToast('Menghapus data...', 'info');
+    const collections = ['santri', 'transaksi', 'kegiatan', 'pengumuman'];
+    for (const coll of collections) {
+      const snap = await userDoc(coll).get();
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+    }
+    await userMeta().set({ pengaturan: {} }, { merge: false });
+    showToast('Semua data telah dihapus', 'warning');
+  } catch (err) {
+    console.error(err);
+    showToast('Gagal menghapus data', 'error');
+  }
+}
+
+/* ============================================================
+   🎨 SEMUA FUNGSI RENDER (sama seperti sebelumnya)
+============================================================ */
+const rupiah = n => 'Rp ' + (n||0).toLocaleString('id-ID');
+const today = () => new Date().toISOString().split('T')[0];
+
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (type !== 'success' ? type : '');
+  const icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  t.innerHTML = `<span>${icons[type]||'✅'}</span> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.animation = 'slideInR .3s reverse'; setTimeout(()=>t.remove(), 300); }, 2500);
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  const icon = next === 'dark' ? '☀️' : '🌙';
+  const t1 = document.getElementById('themeIcon');
+  const t2 = document.getElementById('themeIconLogin');
+  if (t1) t1.textContent = icon;
+  if (t2) t2.textContent = icon;
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+  const icon = saved === 'dark' ? '☀️' : '🌙';
+  const t1 = document.getElementById('themeIcon');
+  const t2 = document.getElementById('themeIconLogin');
+  if (t1) t1.textContent = icon;
+  if (t2) t2.textContent = icon;
+})();
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function toggleSubmenu(id) { document.getElementById(id).classList.toggle('open'); }
+
+document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+  item.onclick = () => goToPage(item.dataset.page);
+});
+
+function goToPage(page) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  const target = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  if (window.innerWidth <= 900) toggleSidebar();
+  refreshAll();
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.getElementById('userDropdown')?.classList.remove('show');
+}
+
+document.getElementById('userPill')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('userDropdown').classList.toggle('show');
+});
+document.addEventListener('click', () => {
+  document.getElementById('userDropdown')?.classList.remove('show');
+});
+
+function updateClock() {
+  const now = new Date();
+  const hour = now.getHours();
+  let greeting = 'Assalamu\'alaikum';
+  if (hour >= 4 && hour < 11) greeting = '🌅 Selamat Pagi';
+  else if (hour >= 11 && hour < 15) greeting = '☀️ Selamat Siang';
+  else if (hour >= 15 && hour < 18) greeting = '🌇 Selamat Sore';
+  else if (hour >= 18) greeting = '🌙 Selamat Malam';
+  
+  const greetEl = document.getElementById('greetTime');
+  if (greetEl) greetEl.textContent = greeting + ', Pemilik';
+  
+  const dateEl = document.getElementById('heroDate');
+  if (dateEl) dateEl.textContent = now.toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  
+  const timeEl = document.getElementById('heroTime');
+  if (timeEl) timeEl.textContent = now.toLocaleTimeString('id-ID', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
+}
+setInterval(updateClock, 1000);
+
+function hitungSaldo(santriId) {
+  return transaksiList
+    .filter(t => t.santriId == santriId)
+    .reduce((sum, t) => sum + (t.jenis === 'masuk' ? t.jumlah : -t.jumlah), 0);
+}
+
+/* ============================================================
+   🎨 RENDER SANTRI
+============================================================ */
+function renderSantri() {
+  const cari = (document.getElementById('cariSantri')?.value || '').toLowerCase();
+  let data = santriList.filter(s => s.nama.toLowerCase().includes(cari));
+  const el = document.getElementById('santriTable');
+  if (!el) return;
+  
+  if (data.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><p>Belum ada santri</p></div>`;
+    return;
+  }
+  
+  el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>No</th><th>Nama</th><th>Kamar</th><th>No. HP Wali</th><th>Saldo</th><th>Aksi</th></tr></thead>
+    <tbody>
+      ${data.map((s, i) => {
+        const saldo = hitungSaldo(s.id);
+        return `<tr>
+          <td>${i+1}</td>
+          <td><strong>${s.nama}</strong></td>
+          <td>${s.kamar || '-'}</td>
+          <td>${s.hp || '-'}</td>
+          <td class="${saldo>=0?'text-positif':'text-negatif'}">${rupiah(saldo)}</td>
+          <td><div style="display:flex; gap:6px;">
+            <button class="btn btn-warning btn-sm btn-icon" onclick="editSantri('${s.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm btn-icon" onclick="hapusSantri('${s.id}')">🗑️</button>
+          </div></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+/* ============================================================
+   🎨 RENDER TRANSAKSI
+============================================================ */
+function renderTableTransaksi(containerId, jenisFilter) {
+  const data = transaksiList
+    .filter(t => t.jenis === jenisFilter)
+    .sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))
+    .slice(0, 20);
+  
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  
+  if (data.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>Belum ada ${jenisFilter === 'masuk' ? 'setoran' : 'pengeluaran'}</p></div>`;
+    return;
+  }
+  
+  el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Tanggal</th><th>Santri</th><th>Jumlah</th><th>Kategori</th><th>Keterangan</th><th>Aksi</th></tr></thead>
+    <tbody>
+      ${data.map(t => {
+        const s = santriList.find(x => x.id == t.santriId);
+        return `<tr>
+          <td>${new Date(t.tanggal).toLocaleDateString('id-ID')}</td>
+          <td><strong>${s ? s.nama : '(dihapus)'}</strong></td>
+          <td class="${t.jenis === 'masuk' ? 'text-positif' : 'text-negatif'}">${t.jenis === 'masuk' ? '+' : '-'} ${rupiah(t.jumlah)}</td>
+          <td><span class="badge badge-info">${t.kategori || '-'}</span></td>
+          <td>${t.ket || '-'}</td>
+          <td><button class="btn btn-danger btn-sm btn-icon" onclick="hapusTransaksi('${t.id}')">🗑️</button></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+/* ============================================================
+   🎨 RENDER RIWAYAT
+============================================================ */
+function renderRiwayat() {
+  const fs = document.getElementById('filterSantri')?.value;
+  const fj = document.getElementById('filterJenis')?.value;
+  const fd = document.getElementById('filterDari')?.value;
+  const fs2 = document.getElementById('filterSampai')?.value;
+  
+  let data = [...transaksiList].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+  if (fs) data = data.filter(t => t.santriId == fs);
+  if (fj) data = data.filter(t => t.jenis === fj);
+  if (fd) data = data.filter(t => t.tanggal >= fd);
+  if (fs2) data = data.filter(t => t.tanggal <= fs2);
+  
+  const el = document.getElementById('riwayatTable');
+  if (!el) return;
+  
+  if (data.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>Tidak ada transaksi</p></div>`;
+    return;
+  }
+  
+  el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Tanggal</th><th>Santri</th><th>Jenis</th><th>Jumlah</th><th>Kategori</th><th>Keterangan</th><th>Aksi</th></tr></thead>
+    <tbody>
+      ${data.map(t => {
+        const s = santriList.find(x => x.id == t.santriId);
+        return `<tr>
+          <td>${new Date(t.tanggal).toLocaleDateString('id-ID')}</td>
+          <td><strong>${s ? s.nama : '(dihapus)'}</strong></td>
+          <td><span class="badge badge-${t.jenis}">${t.jenis === 'masuk' ? '📥 Masuk' : '📤 Keluar'}</span></td>
+          <td class="${t.jenis === 'masuk' ? 'text-positif' : 'text-negatif'}">${t.jenis === 'masuk' ? '+' : '-'} ${rupiah(t.jumlah)}</td>
+          <td>${t.kategori || '-'}</td>
+          <td>${t.ket || '-'}</td>
+          <td><button class="btn btn-danger btn-sm btn-icon" onclick="hapusTransaksi('${t.id}')">🗑️</button></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+/* ============================================================
+   🎨 RENDER LAPORAN
+============================================================ */
+let laporanMode = 'semua';
+function switchTabLaporan(mode, el) {
+  document.querySelectorAll('#page-laporan .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  laporanMode = mode;
+  renderLaporan();
+}
+
+function renderLaporan() {
+  const el = document.getElementById('laporanContent');
+  if (!el) return;
+  
+  if (laporanMode === 'semua') {
+    if (santriList.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-icon">📊</div><p>Belum ada data</p></div>`; return; }
+    
+    let tM = 0, tK = 0;
+    const rows = santriList.map((s, i) => {
+      const trx = transaksiList.filter(t => t.santriId == s.id);
+      const masuk = trx.filter(t => t.jenis === 'masuk').reduce((a,b) => a + b.jumlah, 0);
+      const keluar = trx.filter(t => t.jenis === 'keluar').reduce((a,b) => a + b.jumlah, 0);
+      tM += masuk; tK += keluar;
+      const saldo = masuk - keluar;
+      return `<tr>
+        <td>${i+1}</td>
+        <td><strong>${s.nama}</strong><br><small style="color:var(--text-muted)">${s.kamar||'-'}</small></td>
+        <td class="text-positif">${rupiah(masuk)}</td>
+        <td class="text-negatif">${rupiah(keluar)}</td>
+        <td class="${saldo>=0?'text-positif':'text-negatif'}"><strong>${rupiah(saldo)}</strong></td>
+      </tr>`;
+    }).join('');
+    
+    el.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>No</th><th>Nama Santri</th><th>Total Setoran</th><th>Total Pengeluaran</th><th>Saldo Akhir</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr style="background:var(--bg); font-weight:700;">
+          <td colspan="2">TOTAL</td>
+          <td class="text-positif">${rupiah(tM)}</td>
+          <td class="text-negatif">${rupiah(tK)}</td>
+          <td class="${(tM-tK)>=0?'text-positif':'text-negatif'}">${rupiah(tM-tK)}</td>
+        </tr>
+      </tfoot>
+    </table></div>`;
+  } else if (laporanMode === 'bulanan') {
+    const bulanan = {};
+    transaksiList.forEach(t => {
+      const bln = t.tanggal.substring(0,7);
+      if (!bulanan[bln]) bulanan[bln] = { masuk:0, keluar:0 };
+      bulanan[bln][t.jenis] += t.jumlah;
+    });
+    const keys = Object.keys(bulanan).sort().reverse();
+    if (keys.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-icon">📅</div><p>Belum ada transaksi</p></div>`; return; }
+    
+    el.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Bulan</th><th>Setoran</th><th>Pengeluaran</th><th>Selisih</th></tr></thead>
+      <tbody>
+        ${keys.map(k => {
+          const d = bulanan[k];
+          const sel = d.masuk - d.keluar;
+          return `<tr>
+            <td><strong>${new Date(k+'-01').toLocaleDateString('id-ID',{month:'long', year:'numeric'})}</strong></td>
+            <td class="text-positif">${rupiah(d.masuk)}</td>
+            <td class="text-negatif">${rupiah(d.keluar)}</td>
+            <td class="${sel>=0?'text-positif':'text-negatif'}">${rupiah(sel)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`;
+  } else if (laporanMode === 'kategori') {
+    const kat = {};
+    transaksiList.forEach(t => {
+      const key = (t.jenis === 'masuk' ? '📥 ' : '📤 ') + (t.kategori || 'Lainnya');
+      if (!kat[key]) kat[key] = 0;
+      kat[key] += t.jumlah;
+    });
+    const keys = Object.keys(kat).sort();
+    if (keys.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-icon">🏷️</div><p>Belum ada transaksi</p></div>`; return; }
+    
+    el.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Kategori</th><th>Total</th></tr></thead>
+      <tbody>
+        ${keys.map(k => `<tr><td>${k}</td><td class="${k.startsWith('📥')?'text-positif':'text-negatif'}">${rupiah(kat[k])}</td></tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  }
+}
+
+function cetakLaporan() {
+  const win = window.open('', '', 'width=900,height=650');
+  const tgl = new Date().toLocaleString('id-ID');
+  win.document.write(`
+    <html><head><title>Laporan Bank Santri</title>
+    <style>
+      body { font-family: 'Segoe UI', sans-serif; padding:30px; color:#0f172a; }
+      .kop { text-align:center; border-bottom:3px double #000; padding-bottom:12px; margin-bottom:24px; }
+      .kop h2 { margin:0; font-size:20px; }
+      .kop p { margin:4px 0; font-size:12px; }
+      table { width:100%; border-collapse:collapse; }
+      th,td { border:1px solid #cbd5e1; padding:9px; font-size:12px; }
+      th { background:#10b981; color:white; }
+      tfoot td { background:#f1f5f9; font-weight:700; }
+      .ttd { margin-top:70px; display:flex; justify-content:space-between; }
+      .ttd div { text-align:center; width:220px; font-size:13px; }
+      .sub { color:#64748b; margin-bottom:20px; font-size:12px; }
+    </style></head><body>
+      <div class="kop">
+        <h2>${pengaturan.namaPesantren || 'PESANTREN'}</h2>
+        <p>${pengaturan.alamat || ''}</p>
+        <p style="font-weight:bold; margin-top:10px;">LAPORAN KEUANGAN SANTRI</p>
+      </div>
+      <div class="sub">Dicetak: ${tgl}</div>
+      ${document.getElementById('laporanContent').innerHTML}
+      <div class="ttd">
+        <div><br><br>__________________<br>${pengaturan.bendahara || 'Bendahara'}</div>
+        <div><br><br>__________________<br>${pengaturan.pengasuh || 'Pengasuh'}</div>
+      </div>
+    </body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 400);
+}
+
+function exportCSV() {
+  let csv = 'Tanggal,Santri,Jenis,Kategori,Jumlah,Keterangan\n';
+  transaksiList.forEach(t => {
+    const s = santriList.find(x => x.id == t.santriId);
+    csv += `"${t.tanggal}","${s?s.nama:'-'}","${t.jenis}","${t.kategori||'-'}",${t.jumlah},"${t.ket||'-'}"\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `laporan-${today()}.csv`;
+  a.click();
+  showToast('File CSV berhasil didownload');
+}
+
+/* ============================================================
+   🎨 RENDER SALDO
+============================================================ */
+function renderSaldo() {
+  const cari = (document.getElementById('cariSaldo')?.value || '').toLowerCase();
+  const urut = document.getElementById('urutSaldo')?.value || 'nama';
+  
+  let data = santriList
+    .filter(s => s.nama.toLowerCase().includes(cari))
+    .map(s => ({...s, saldo: hitungSaldo(s.id)}));
+  
+  if (urut === 'nama') data.sort((a,b) => a.nama.localeCompare(b.nama));
+  else if (urut === 'saldo-desc') data.sort((a,b) => b.saldo - a.saldo);
+  else if (urut === 'saldo-asc') data.sort((a,b) => a.saldo - b.saldo);
+  
+  const el = document.getElementById('saldoGrid');
+  if (!el) return;
+  
+  if (data.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🏦</div><p>Belum ada santri</p></div>`;
+    return;
+  }
+  
+  el.innerHTML = `<div class="grid-cards">
+    ${data.map(s => {
+      const trx = transaksiList.filter(t => t.santriId == s.id);
+      const masuk = trx.filter(t => t.jenis === 'masuk').reduce((a,b) => a + b.jumlah, 0);
+      const keluar = trx.filter(t => t.jenis === 'keluar').reduce((a,b) => a + b.jumlah, 0);
+      return `<div class="info-card ${s.saldo>=0?'border-top-green':'border-top-red'}">
+        <h4>👤 ${s.nama}</h4>
+        <div class="meta">
+          <span>🏠 ${s.kamar || '-'}</span>
+          <span>📱 ${s.hp || '-'}</span>
+        </div>
+        <div class="saldo-big ${s.saldo>=0?'text-positif':'text-negatif'}">${rupiah(s.saldo)}</div>
+        <div style="font-size:11px; color:var(--text-muted); display:flex; gap:14px; padding-top:10px; border-top:1px solid var(--border);">
+          <span>📥 <strong style="color:var(--primary)">${rupiah(masuk)}</strong></span>
+          <span>📤 <strong style="color:var(--danger)">${rupiah(keluar)}</strong></span>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ============================================================
+   🎨 RENDER KEGIATAN
+============================================================ */
+function renderKegiatan() {
+  const el = document.getElementById('kegiatanGrid');
+  if (!el) return;
+  if (kegiatanList.length === 0) {
+    el.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📅</div><p>Belum ada kegiatan</p></div>`;
+    return;
+  }
+  const sorted = [...kegiatanList].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+  el.innerHTML = sorted.map(k => `
+    <div class="info-card border-top-blue">
+      <h4>📅 ${k.nama}</h4>
+      <div class="meta">
+        <span>🗓️ ${new Date(k.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</span>
+        ${k.waktu ? `<span>⏰ ${k.waktu}</span>` : ''}
+        ${k.lokasi ? `<span>📍 ${k.lokasi}</span>` : ''}
+      </div>
+      <p>${k.desk || 'Tidak ada deskripsi'}</p>
+      <div style="margin-top:14px; display:flex; gap:6px;">
+        <button class="btn btn-warning btn-sm" onclick="editKegiatan('${k.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="hapusKegiatan('${k.id}')">🗑️ Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   🎨 RENDER PENGUMUMAN
+============================================================ */
+function renderPengumuman() {
+  const el = document.getElementById('pengumumanList');
+  if (!el) return;
+  if (pengumumanList.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📢</div><p>Belum ada pengumuman</p></div>`;
+    return;
+  }
+  const sorted = [...pengumumanList].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+  const colors = { info:'var(--info)', penting:'var(--warning)', urgent:'var(--danger)' };
+  const icons = { info:'ℹ️', penting:'⚠️', urgent:'🚨' };
+  
+  el.innerHTML = sorted.map(p => `
+    <div style="padding:16px; border-left:4px solid ${colors[p.prioritas]}; background:var(--bg); border-radius:10px; margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:start; gap:10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:200px;">
+          <h4 style="font-size:14.5px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+            ${icons[p.prioritas]} ${p.judul}
+            <span class="badge badge-${p.prioritas==='urgent'?'keluar':p.prioritas==='penting'?'warning':'info'}">${p.prioritas}</span>
+          </h4>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
+            ${new Date(p.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}
+          </div>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.6;">${p.isi}</p>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-warning btn-sm btn-icon" onclick="editPengumuman('${p.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="hapusPengumuman('${p.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateBadgePengumuman() {
+  const badge = document.getElementById('badgePengumuman');
+  if (!badge) return;
+  const urgentCount = pengumumanList.filter(p => p.prioritas === 'urgent').length;
+  badge.textContent = pengumumanList.length;
+  badge.style.display = pengumumanList.length === 0 ? 'none' : 'inline-block';
+  if (urgentCount > 0) badge.style.background = 'var(--danger)';
+}
+
+/* ============================================================
+   🎨 RENDER CHART
+============================================================ */
+function renderChart() {
+  const el = document.getElementById('chartBulanan');
+  if (!el) return;
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = d.toISOString().substring(0,7);
+    const label = d.toLocaleDateString('id-ID', {month:'short'});
+    const masuk = transaksiList.filter(t => t.jenis === 'masuk' && t.tanggal.startsWith(key)).reduce((a,b) => a + b.jumlah, 0);
+    const keluar = transaksiList.filter(t => t.jenis === 'keluar' && t.tanggal.startsWith(key)).reduce((a,b) => a + b.jumlah, 0);
+    months.push({ label, masuk, keluar });
+  }
+  const max = Math.max(...months.map(m => Math.max(m.masuk, m.keluar)), 1);
+  el.innerHTML = months.map(m => {
+    const hM = (m.masuk / max) * 100;
+    const hK = (m.keluar / max) * 100;
+    return `<div class="bar-item">
+      <div class="bar-pair">
+        <div class="bar masuk" style="height:${hM}%" title="Setoran: ${rupiah(m.masuk)}"></div>
+        <div class="bar keluar" style="height:${hK}%" title="Pengeluaran: ${rupiah(m.keluar)}"></div>
+      </div>
+      <div class="bar-label">${m.label}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   🎨 RENDER DASHBOARD
+============================================================ */
+function getMonthTotal(jenis, year, month) {
+  return transaksiList
+    .filter(t => {
+      const d = new Date(t.tanggal);
+      return t.jenis === jenis && d.getFullYear() === year && d.getMonth() === month;
+    })
+    .reduce((a, b) => a + b.jumlah, 0);
+}
+
+function formatTrend(current, previous) {
+  if (previous === 0) return current > 0 ? { text: 'Baru', class: 'up' } : { text: '-', class: 'neutral' };
+  const pct = ((current - previous) / previous) * 100;
+  if (pct > 0) return { text: '↑ ' + pct.toFixed(0) + '%', class: 'up' };
+  if (pct < 0) return { text: '↓ ' + Math.abs(pct).toFixed(0) + '%', class: 'down' };
+  return { text: '0%', class: 'neutral' };
+}
+
+function renderDashboard() {
+  const now = new Date();
+  const thisMonth = { y: now.getFullYear(), m: now.getMonth() };
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonth = { y: lastMonthDate.getFullYear(), m: lastMonthDate.getMonth() };
+  
+  const totalMasuk = transaksiList.filter(t => t.jenis === 'masuk').reduce((a,b) => a + b.jumlah, 0);
+  const totalKeluar = transaksiList.filter(t => t.jenis === 'keluar').reduce((a,b) => a + b.jumlah, 0);
+  const totalSaldo = totalMasuk - totalKeluar;
+  
+  const masukBulanIni = getMonthTotal('masuk', thisMonth.y, thisMonth.m);
+  const keluarBulanIni = getMonthTotal('keluar', thisMonth.y, thisMonth.m);
+  const masukBulanLalu = getMonthTotal('masuk', lastMonth.y, lastMonth.m);
+  const keluarBulanLalu = getMonthTotal('keluar', lastMonth.y, lastMonth.m);
+  
+  const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setTxt('statSaldo', rupiah(totalSaldo));
+  setTxt('statMasukBulan', rupiah(masukBulanIni));
+  setTxt('statKeluarBulan', rupiah(keluarBulanIni));
+  setTxt('statSantri', santriList.length);
+  
+  const tM = document.getElementById('trendMasuk');
+  if (tM) { const t = formatTrend(masukBulanIni, masukBulanLalu); tM.textContent = t.text; tM.className = 'stat-trend-badge ' + t.class; }
+  const tK = document.getElementById('trendKeluar');
+  if (tK) { const t = formatTrend(keluarBulanIni, keluarBulanLalu); tK.textContent = t.text; tK.className = 'stat-trend-badge ' + t.class; }
+  
+  const tS = document.getElementById('trendSantri');
+  if (tS) {
+    const santriBaru = santriList.filter(s => {
+      if (!s.tgl) return false;
+      const d = new Date(s.tgl);
+      return d.getFullYear() === thisMonth.y && d.getMonth() === thisMonth.m;
+    }).length;
+    tS.textContent = santriBaru > 0 ? '+' + santriBaru + ' baru' : 'bulan ini';
+    tS.className = 'stat-trend-badge ' + (santriBaru > 0 ? 'up' : 'neutral');
+  }
+  
+  // TOP 5
+  const dl = document.getElementById('dashboardList');
+  if (dl) {
+    if (santriList.length === 0) {
+      dl.innerHTML = `<div class="empty" style="padding:30px 10px;"><div class="empty-icon" style="font-size:40px;">🕌</div><p>Belum ada santri</p></div>`;
+    } else {
+      const sorted = [...santriList].map(s => ({...s, saldo: hitungSaldo(s.id)})).sort((a,b) => b.saldo - a.saldo).slice(0, 5);
+      const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+      dl.innerHTML = sorted.map((s, i) => {
+        const jmlTrx = transaksiList.filter(t => t.santriId == s.id).length;
+        return `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--bg); border-radius:10px; margin-bottom:8px;">
+          <div style="display:flex; align-items:center; gap:12px; min-width:0; flex:1;">
+            <span style="font-size:22px;">${medals[i]}</span>
+            <div style="min-width:0; flex:1;">
+              <strong style="display:block; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.nama}</strong>
+              <small style="font-size:11px; color:var(--text-muted);">${s.kamar || 'Tanpa kamar'} · ${jmlTrx} transaksi</small>
+            </div>
+          </div>
+          <div class="${s.saldo>=0?'text-positif':'text-negatif'}" style="font-size:14px; font-weight:800; white-space:nowrap; margin-left:8px;">${rupiah(s.saldo)}</div>
+        </div>`;
+      }).join('');
+    }
+  }
+  
+  // INSIGHT
+  const insightEl = document.getElementById('insightContent');
+  if (insightEl) {
+    const insights = [];
+    const selisih = masukBulanIni - keluarBulanIni;
+    if (masukBulanIni > 0 || keluarBulanIni > 0) {
+      if (selisih > 0) insights.push({ icon:'✅', class:'good', title:'Keuangan Sehat', text:`Bulan ini surplus ${rupiah(selisih)}.` });
+      else if (selisih < 0) insights.push({ icon:'⚠️', class:'warn', title:'Defisit Bulan Ini', text:`Pengeluaran melebihi pemasukan sebesar ${rupiah(Math.abs(selisih))}.` });
+      else insights.push({ icon:'ℹ️', class:'', title:'Seimbang', text:'Pemasukan dan pengeluaran seimbang.' });
+    } else {
+      insights.push({ icon:'📊', class:'', title:'Belum Ada Transaksi', text:'Belum ada transaksi bulan ini.' });
+    }
+    if (masukBulanLalu > 0) {
+      const diff = ((masukBulanIni - masukBulanLalu) / masukBulanLalu) * 100;
+      if (diff > 10) insights.push({ icon:'📈', class:'good', title:'Pemasukan Naik', text:`Setoran naik ${diff.toFixed(0)}% dibanding bulan lalu.` });
+      else if (diff < -10) insights.push({ icon:'📉', class:'warn', title:'Pemasukan Turun', text:`Setoran turun ${Math.abs(diff).toFixed(0)}%.` });
+    }
+    const negatifCount = santriList.filter(s => hitungSaldo(s.id) < 0).length;
+    if (negatifCount > 0) insights.push({ icon:'🚨', class:'bad', title: negatifCount + ' Santri Saldo Negatif', text:`Ada ${negatifCount} santri saldo minus.` });
+    if (insights.length === 0) insights.push({ icon:'💡', class:'', title:'Selamat Datang', text:'Tambahkan santri dan catat transaksi.' });
+    
+    insightEl.innerHTML = insights.map(i => `
+      <div class="insight-item ${i.class}">
+        <div class="insight-icon">${i.icon}</div>
+        <div style="flex:1;"><strong>${i.title}</strong><p>${i.text}</p></div>
+      </div>
+    `).join('');
+  }
+  
+  // SALDO RENDAH
+  const lowEl = document.getElementById('lowBalanceList');
+  if (lowEl) {
+    const low = santriList.map(s => ({...s, saldo: hitungSaldo(s.id)})).filter(s => s.saldo < 50000).sort((a,b) => a.saldo - b.saldo).slice(0, 5);
+    if (low.length === 0) {
+      lowEl.innerHTML = `<div class="empty" style="padding:30px 10px;"><div class="empty-icon" style="font-size:40px;">✨</div><p>Semua santri saldonya aman</p></div>`;
+    } else {
+      lowEl.innerHTML = low.map(s => `
+        <div class="low-balance-item ${s.saldo < 0 ? 'danger' : ''}">
+          <div class="info"><strong>${s.nama}</strong><small>${s.kamar || 'Tanpa kamar'}</small></div>
+          <div class="amount">${rupiah(s.saldo)}</div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  // TRANSAKSI TERBARU
+  const recEl = document.getElementById('recentTransactions');
+  if (recEl) {
+    const rec = [...transaksiList].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0, 5);
+    if (rec.length === 0) {
+      recEl.innerHTML = `<div class="empty" style="padding:30px 10px;"><div class="empty-icon" style="font-size:40px;">📭</div><p>Belum ada transaksi</p></div>`;
+    } else {
+      recEl.innerHTML = rec.map(t => {
+        const s = santriList.find(x => x.id == t.santriId);
+        const tgl = new Date(t.tanggal);
+        const selisih = Math.floor((new Date() - tgl) / 86400000);
+        let kapan;
+        if (selisih === 0) kapan = 'Hari ini';
+        else if (selisih === 1) kapan = 'Kemarin';
+        else if (selisih < 7) kapan = selisih + ' hari lalu';
+        else kapan = tgl.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+        return `<div class="recent-item">
+          <div class="recent-icon ${t.jenis}">${t.jenis === 'masuk' ? '📥' : '📤'}</div>
+          <div class="recent-info">
+            <strong>${s ? s.nama : '(dihapus)'} · ${t.kategori || '-'}</strong>
+            <small>${t.ket || 'Tanpa keterangan'} · ${kapan}</small>
+          </div>
+          <div class="recent-amount ${t.jenis === 'masuk' ? 'text-positif' : 'text-negatif'}">
+            ${t.jenis === 'masuk' ? '+' : '-'}${rupiah(t.jumlah)}
+            <small>${t.jenis === 'masuk' ? 'masuk' : 'keluar'}</small>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+  
+  // KEGIATAN
+  const evEl = document.getElementById('upcomingEvents');
+  if (evEl) {
+    const todayStr = today();
+    const up = [...kegiatanList].filter(k => k.tanggal >= todayStr).sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal)).slice(0, 3);
+    if (up.length === 0) {
+      evEl.innerHTML = `<div class="empty" style="padding:30px 10px;"><div class="empty-icon" style="font-size:40px;">📅</div><p>Tidak ada kegiatan mendatang</p></div>`;
+    } else {
+      evEl.innerHTML = up.map(k => {
+        const d = new Date(k.tanggal);
+        return `<div class="event-item" onclick="goToPage('kegiatan')">
+          <div class="event-date">
+            <span class="day">${d.getDate()}</span>
+            <span class="month">${d.toLocaleDateString('id-ID',{month:'short'})}</span>
+          </div>
+          <div class="event-info">
+            <strong>${k.nama}</strong>
+            <small>⏰ ${k.waktu || 'Sepanjang hari'} · 📍 ${k.lokasi || '-'}</small>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+  
+  // PENGUMUMAN
+  const anEl = document.getElementById('activeAnnouncements');
+  if (anEl) {
+    const rec = [...pengumumanList].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0, 3);
+    if (rec.length === 0) {
+      anEl.innerHTML = `<div class="empty" style="padding:30px 10px;"><div class="empty-icon" style="font-size:40px;">📢</div><p>Belum ada pengumuman</p></div>`;
+    } else {
+      const icons = { info:'ℹ️', penting:'⚠️', urgent:'🚨' };
+      anEl.innerHTML = rec.map(p => `
+        <div class="announce-item ${p.prioritas}" onclick="goToPage('pengumuman')">
+          <strong>${icons[p.prioritas]} ${p.judul}</strong>
+          <p>${p.isi}</p>
+          <small style="display:block;margin-top:6px;font-size:10.5px;color:var(--text-muted);">
+            ${new Date(p.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}
+          </small>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+/* ============================================================
+   🌐 GLOBAL SEARCH
+============================================================ */
+function globalSearchHandler() {
+  const q = document.getElementById('globalSearch').value.toLowerCase();
+  if (!q) return;
+  goToPage('santri');
+  document.getElementById('cariSantri').value = q;
+  renderSantri();
+}
+
+/* ============================================================
+   🔄 REFRESH ALL
+============================================================ */
+function refreshAll() {
+  const opts = santriList.map(s => `<option value="${s.id}">${s.nama}${s.kamar?' - '+s.kamar:''}</option>`).join('');
+  ['setorSantri','keluarSantri'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<option value="">-- Pilih Santri --</option>' + opts;
+  });
+  const fS = document.getElementById('filterSantri');
+  if (fS) fS.innerHTML = '<option value="">-- Semua Santri --</option>' + opts;
+  
+  renderSantri();
+  renderTableTransaksi('setoranTable', 'masuk');
+  renderTableTransaksi('pengeluaranTable', 'keluar');
+  renderRiwayat();
+  renderLaporan();
+  renderSaldo();
+  renderChart();
+  renderDashboard();
+  updateClock();
+  updateBadgePengumuman();
+  
+  const setDate = (id) => { const el = document.getElementById(id); if (el && !el.value) el.value = today(); };
+  ['setorTanggal','keluarTanggal','kegiatanTanggal','pengTanggal','santriTgl'].forEach(setDate);
+}
 </script>
-</body>
-</html>
