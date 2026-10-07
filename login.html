@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login — Bank Santri</title>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -13,17 +12,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:'Plus Jakarta Sans', sans-serif; }
-
 :root {
   --bg: #f5f7fb; --bg-alt: #ffffff; --bg-elevated: #ffffff;
   --text: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
-  --primary: #10b981; --danger: #ef4444;
+  --primary: #10b981; --primary-dark: #059669;
+  --danger: #ef4444; --warning: #f59e0b; --info: #3b82f6; --purple: #8b5cf6;
 }
 [data-theme="dark"] {
   --bg: #0a0f1a; --bg-alt: #111827; --bg-elevated: #1a2234;
   --text: #f1f5f9; --text-muted: #94a3b8; --border: #1e293b;
 }
-
 body {
   background: var(--bg); color: var(--text);
   min-height: 100vh; overflow-x: hidden;
@@ -46,7 +44,7 @@ body {
 .loading-text { font-size: 14px; color: var(--text-muted); font-weight: 600; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* LOGIN */
+/* LOGIN SCREEN */
 .login-screen {
   position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
   z-index: 5000; padding: 20px; overflow: hidden; background: var(--bg);
@@ -73,37 +71,68 @@ body {
 }
 
 .login-card {
-  width: 100%; max-width: 420px; background: var(--bg-elevated);
-  border-radius: 24px; padding: 40px 36px;
+  width: 100%; max-width: 440px; background: var(--bg-elevated);
+  border-radius: 24px; padding: 36px 32px;
   box-shadow: 0 20px 60px rgba(15,23,42,.15);
   border: 1px solid var(--border); position: relative; z-index: 1;
   animation: fadeSlideIn .7s cubic-bezier(.34,1.56,.64,1);
+  max-height: 92vh; overflow-y: auto;
 }
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(40px) scale(.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .login-header-icon {
-  width: 76px; height: 76px; border-radius: 22px;
+  width: 72px; height: 72px; border-radius: 22px;
   background: linear-gradient(135deg, #10b981, #059669);
   display: flex; align-items: center; justify-content: center;
-  font-size: 38px; margin: 0 auto 24px;
+  font-size: 36px; margin: 0 auto 20px;
   box-shadow: 0 12px 32px rgba(16,185,129,.4);
-  animation: pulseGlow 3s ease-in-out infinite;
 }
-@keyframes pulseGlow {
-  0%,100% { box-shadow: 0 12px 32px rgba(16,185,129,.4); }
-  50% { box-shadow: 0 12px 42px rgba(16,185,129,.65); }
+.login-header-icon.setup {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 12px 32px rgba(139,92,246,.4);
 }
 .login-card h1 {
-  font-size: 26px; font-weight: 800; text-align: center;
-  letter-spacing: -.8px; margin-bottom: 8px;
+  font-size: 24px; font-weight: 800; text-align: center;
+  letter-spacing: -.8px; margin-bottom: 6px;
 }
 .login-card .subtitle {
   text-align: center; color: var(--text-muted);
-  font-size: 14px; margin-bottom: 32px;
+  font-size: 13.5px; margin-bottom: 24px;
 }
-.login-form { display: flex; flex-direction: column; gap: 18px; }
+
+/* SETUP HINT BOX */
+.setup-hint {
+  background: linear-gradient(135deg, rgba(139,92,246,.08), rgba(59,130,246,.08));
+  border: 1px solid rgba(139,92,246,.2);
+  border-radius: 12px; padding: 14px 16px;
+  font-size: 12.5px; color: var(--text-muted);
+  margin-bottom: 18px; line-height: 1.6;
+}
+.setup-hint strong { color: #8b5cf6; }
+
+/* TABS */
+.role-tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  background: var(--bg); padding: 5px;
+  border-radius: 12px; margin-bottom: 22px;
+  border: 1px solid var(--border);
+}
+.role-tab {
+  padding: 11px; border: none; background: transparent;
+  color: var(--text-muted); font-size: 13px; font-weight: 700;
+  cursor: pointer; border-radius: 9px; transition: all .2s;
+  font-family: inherit; display: flex; align-items: center;
+  justify-content: center; gap: 7px;
+}
+.role-tab:hover { color: var(--text); }
+.role-tab.active {
+  background: var(--bg-elevated); color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.login-form { display: flex; flex-direction: column; gap: 16px; }
 .input-group { display: flex; flex-direction: column; gap: 7px; }
 .input-group label { font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
 .input-wrap { position: relative; }
@@ -135,6 +164,24 @@ body {
   opacity: .5; padding: 4px;
 }
 .toggle-password:hover { opacity: 1; }
+.input-hint {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* PASSWORD STRENGTH */
+.pwd-strength {
+  display: flex; gap: 4px; margin-top: 6px;
+}
+.pwd-strength .bar {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: var(--border); transition: background .3s;
+}
+.pwd-strength.weak .bar:nth-child(1) { background: var(--danger); }
+.pwd-strength.medium .bar:nth-child(1),
+.pwd-strength.medium .bar:nth-child(2) { background: var(--warning); }
+.pwd-strength.strong .bar { background: var(--primary); }
+
 .btn-login {
   width: 100%; padding: 15px; border-radius: 12px; border: none;
   background: linear-gradient(135deg, #10b981, #059669);
@@ -146,6 +193,13 @@ body {
 }
 .btn-login:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(16,185,129,.45); }
 .btn-login:disabled { opacity: .7; cursor: not-allowed; }
+.btn-login.setup {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 10px 30px rgba(139,92,246,.35);
+}
+.btn-login.setup:hover:not(:disabled) {
+  box-shadow: 0 14px 38px rgba(139,92,246,.45);
+}
 .spinner {
   width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.3);
   border-top-color: white; border-radius: 50%;
@@ -158,7 +212,8 @@ body {
 .login-alert.show { display: flex; }
 .login-alert.error { background: rgba(239,68,68,.1); color: var(--danger); border: 1px solid rgba(239,68,68,.2); }
 .login-alert.success { background: rgba(16,185,129,.1); color: var(--primary); border: 1px solid rgba(16,185,129,.2); }
-.login-footer { margin-top: 28px; text-align: center; font-size: 12px; color: var(--text-muted); }
+.login-alert.info { background: rgba(59,130,246,.1); color: var(--info); border: 1px solid rgba(59,130,246,.2); }
+.login-footer { margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-muted); }
 .theme-toggle-login {
   position: absolute; top: 20px; right: 20px; width: 42px; height: 42px;
   border-radius: 12px; background: var(--bg-alt); border: 1px solid var(--border);
@@ -170,14 +225,11 @@ body {
   display: flex; align-items: center; gap: 8px;
   font-size: 13px; color: var(--text-muted); cursor: pointer;
 }
-.checkbox-label input {
-  width: 16px; height: 16px;
-  accent-color: var(--primary);
-}
+.checkbox-label input { width: 16px; height: 16px; accent-color: var(--primary); }
 @media (max-width: 600px) {
-  .login-card { padding: 32px 24px; }
+  .login-card { padding: 28px 22px; }
   .login-card h1 { font-size: 22px; }
-  .login-header-icon { width: 64px; height: 64px; font-size: 32px; }
+  .login-header-icon { width: 60px; height: 60px; font-size: 30px; }
 }
 </style>
 </head>
@@ -192,42 +244,84 @@ body {
   <button class="theme-toggle-login" onclick="toggleTheme()" id="themeIcon">🌙</button>
   
   <div class="login-card">
-    <div class="login-header-icon">🕌</div>
-    <h1>Bank Santri</h1>
-    <p class="subtitle">Masuk untuk melanjutkan</p>
+    <div class="login-header-icon" id="headerIcon">🕌</div>
+    <h1 id="titleText">Bank Santri</h1>
+    <p class="subtitle" id="subtitleText">Masuk untuk melanjutkan</p>
     
-    <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
-      <div class="login-alert error" id="loginAlert"></div>
+    <!-- TABS ROLE (hanya tampil di mode LOGIN) -->
+    <div class="role-tabs" id="roleTabs">
+      <button class="role-tab active" onclick="switchRole('admin')" id="tabAdmin">
+        🛡️ Admin
+      </button>
+      <button class="role-tab" onclick="switchRole('santri')" id="tabSantri">
+        🎓 Santri
+      </button>
+    </div>
+    
+    <!-- HINT SETUP (hanya tampil di mode SETUP) -->
+    <div class="setup-hint" id="setupHint" style="display:none;">
+      <strong>🎉 Pertama Kali!</strong><br>
+      Belum ada akun admin. Buat akun admin pertama di sini — username & password bebas Anda tentukan sendiri. Setelah itu, admin bisa buat akun santri dari dalam aplikasi.
+    </div>
+    
+    <form class="login-form" id="authForm" onsubmit="handleSubmit(event)">
+      <div class="login-alert" id="authAlert"></div>
       
-      <div class="input-group">
-        <label>Email</label>
+      <!-- NAMA LENGKAP (hanya di mode SETUP) -->
+      <div class="input-group" id="groupNama" style="display:none;">
+        <label>Nama Lengkap</label>
         <div class="input-wrap">
-          <span class="input-icon">📧</span>
-          <input type="email" id="loginEmail" placeholder="admin@banksantri.com" autocomplete="email" required>
+          <span class="input-icon">📝</span>
+          <input type="text" id="inputNama" placeholder="Contoh: Ustadz Ahmad">
         </div>
       </div>
       
+      <!-- USERNAME -->
+      <div class="input-group">
+        <label>Username</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="inputUsername" placeholder="Contoh: admin" autocomplete="username" required oninput="onUsernameInput()">
+        </div>
+        <div class="input-hint" id="usernameHint">Hanya huruf kecil, angka, dan underscore (min 4 karakter)</div>
+      </div>
+      
+      <!-- PASSWORD -->
       <div class="input-group">
         <label>Password</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
-          <input type="password" id="loginPassword" placeholder="Masukkan password" autocomplete="current-password" required>
+          <input type="password" id="inputPassword" placeholder="Min 6 karakter" autocomplete="current-password" required oninput="onPasswordInput()">
           <button type="button" class="toggle-password" onclick="togglePassword()" id="togglePassBtn">👁️</button>
+        </div>
+        <div class="pwd-strength" id="pwdStrength" style="display:none;">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
         </div>
       </div>
       
-      <label class="checkbox-label">
+      <!-- KONFIRMASI PASSWORD (hanya di mode SETUP) -->
+      <div class="input-group" id="groupKonfirmasi" style="display:none;">
+        <label>Konfirmasi Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔐</span>
+          <input type="password" id="inputKonfirmasi" placeholder="Ulangi password">
+        </div>
+      </div>
+      
+      <label class="checkbox-label" id="rememberLabel">
         <input type="checkbox" id="loginRemember" checked>
         <span>Ingat saya di perangkat ini</span>
       </label>
       
-      <button type="submit" class="btn-login" id="btnLogin">
-        <span id="btnLoginText">🔓 Masuk</span>
+      <button type="submit" class="btn-login" id="btnSubmit">
+        <span id="btnSubmitText">🔓 Masuk</span>
       </button>
     </form>
     
     <div class="login-footer">
-      🔥 Terhubung ke Firebase · Asrama Putra
+      🔥 Firebase · Asrama Putra
     </div>
   </div>
 </div>
@@ -245,10 +339,11 @@ const firebaseConfig = {
   appId: "1:904746451509:web:1fd0fcb9db58667953e77c"
 };
 
-let auth = null;
+let auth = null, db = null;
 try {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
+  db = firebase.firestore();
   console.log('✅ Firebase initialized');
 } catch (err) {
   console.error('❌ Firebase error:', err);
@@ -256,87 +351,329 @@ try {
 }
 
 /* ============================================================
-   🔐 AUTH CHECK — Kalau sudah login, redirect ke index.html
+   🎯 STATE
 ============================================================ */
-if (auth) {
-  auth.onAuthStateChanged((user) => {
-    hideLoading();
-    if (user) {
-      console.log('Sudah login:', user.email);
-      window.location.href = 'index.html';
-    }
-  });
-} else {
-  hideLoading();
-}
+let currentRole = 'admin';      // 'admin' | 'santri'
+let isSetupMode = false;        // true jika belum ada admin
 
-function hideLoading() {
-  const el = document.getElementById('loadingOverlay');
-  if (el) el.classList.add('hide');
+/* ============================================================
+   🔍 CEK APAKAH SUDAH ADA ADMIN
+============================================================ */
+async function checkAdminExists() {
+  try {
+    // Cek di collection 'usernames' apakah ada yang role=admin
+    const snap = await db.collection('usernames').where('role', '==', 'admin').limit(1).get();
+    return !snap.empty;
+  } catch (err) {
+    console.error('Check admin error:', err);
+    // Kalau error (mungkin rules belum di-set), default: coba setup
+    return false;
+  }
 }
 
 /* ============================================================
-   🔓 LOGIN HANDLER
+   🎬 INIT
 ============================================================ */
-async function handleLogin(e) {
+(async function init() {
+  if (!auth) { hideLoading(); return; }
+  
+  // Kalau sudah login, langsung ke index.html
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      console.log('Sudah login:', user.email);
+      window.location.href = 'index.html';
+      return;
+    }
+    
+    // Belum login → cek setup mode
+    checkAdminExists().then(adminExists => {
+      isSetupMode = !adminExists;
+      applyMode();
+      hideLoading();
+    });
+  });
+})();
+
+function hideLoading() {
+  document.getElementById('loadingOverlay')?.classList.add('hide');
+}
+
+/* ============================================================
+   🎨 APPLY MODE (SETUP vs LOGIN)
+============================================================ */
+function applyMode() {
+  if (isSetupMode) {
+    // === MODE SETUP: Buat admin pertama ===
+    document.getElementById('headerIcon').className = 'login-header-icon setup';
+    document.getElementById('headerIcon').textContent = '🛡️';
+    document.getElementById('titleText').textContent = 'Setup Admin';
+    document.getElementById('subtitleText').textContent = 'Buat akun admin pertama';
+    document.getElementById('roleTabs').style.display = 'none';
+    document.getElementById('setupHint').style.display = 'block';
+    document.getElementById('groupNama').style.display = 'flex';
+    document.getElementById('groupKonfirmasi').style.display = 'flex';
+    document.getElementById('pwdStrength').style.display = 'flex';
+    document.getElementById('rememberLabel').style.display = 'none';
+    document.getElementById('usernameHint').textContent = 'Hanya huruf kecil, angka, dan underscore (min 4 karakter)';
+    
+    const btn = document.getElementById('btnSubmit');
+    btn.className = 'btn-login setup';
+    document.getElementById('btnSubmitText').innerHTML = '🛡️ Buat Akun Admin';
+    
+  } else {
+    // === MODE LOGIN: Login normal ===
+    document.getElementById('headerIcon').className = 'login-header-icon';
+    document.getElementById('headerIcon').textContent = '🕌';
+    document.getElementById('titleText').textContent = 'Bank Santri';
+    document.getElementById('subtitleText').textContent = 'Masuk untuk melanjutkan';
+    document.getElementById('roleTabs').style.display = 'grid';
+    document.getElementById('setupHint').style.display = 'none';
+    document.getElementById('groupNama').style.display = 'none';
+    document.getElementById('groupKonfirmasi').style.display = 'none';
+    document.getElementById('pwdStrength').style.display = 'none';
+    document.getElementById('rememberLabel').style.display = 'flex';
+    
+    switchRole('admin');
+  }
+}
+
+/* ============================================================
+   🎭 SWITCH ROLE TAB
+============================================================ */
+function switchRole(role) {
+  currentRole = role;
+  document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
+  document.getElementById('tabSantri').classList.toggle('active', role === 'santri');
+  
+  const btnText = document.getElementById('btnSubmitText');
+  btnText.innerHTML = role === 'admin' 
+    ? '🔓 Masuk sebagai Admin' 
+    : '🔓 Masuk sebagai Santri';
+  
+  document.getElementById('authAlert').classList.remove('show');
+}
+
+/* ============================================================
+   👁️ TOGGLE PASSWORD
+============================================================ */
+function togglePassword() {
+  const inp = document.getElementById('inputPassword');
+  const btn = document.getElementById('togglePassBtn');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+/* ============================================================
+   📝 INPUT HANDLERS
+============================================================ */
+function onUsernameInput() {
+  const inp = document.getElementById('inputUsername');
+  // Auto lowercase + hapus spasi & karakter invalid
+  inp.value = inp.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+}
+
+function onPasswordInput() {
+  if (!isSetupMode) return;
+  const val = document.getElementById('inputPassword').value;
+  const bar = document.getElementById('pwdStrength');
+  bar.className = 'pwd-strength';
+  if (val.length === 0) return;
+  if (val.length < 6) bar.classList.add('weak');
+  else if (val.length < 10) bar.classList.add('medium');
+  else bar.classList.add('strong');
+}
+
+/* ============================================================
+   🚀 HANDLE SUBMIT (SETUP atau LOGIN)
+============================================================ */
+async function handleSubmit(e) {
   e.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
+  if (isSetupMode) {
+    await handleSetupAdmin();
+  } else {
+    await handleLogin();
+  }
+}
+
+/* ============================================================
+   🛡️ SETUP ADMIN PERTAMA
+============================================================ */
+async function handleSetupAdmin() {
+  const nama = document.getElementById('inputNama').value.trim();
+  const username = document.getElementById('inputUsername').value.trim().toLowerCase();
+  const password = document.getElementById('inputPassword').value;
+  const konfirmasi = document.getElementById('inputKonfirmasi').value;
+  const btn = document.getElementById('btnSubmit');
+  const btnText = document.getElementById('btnSubmitText');
+  const alertEl = document.getElementById('authAlert');
+  
+  alertEl.classList.remove('show');
+  
+  // Validasi
+  if (!nama) { showAlert('Nama lengkap wajib diisi!', 'error'); return; }
+  if (!username) { showAlert('Username wajib diisi!', 'error'); return; }
+  if (username.length < 4) { showAlert('Username minimal 4 karakter!', 'error'); return; }
+  if (!/^[a-z0-9_]+$/.test(username)) { showAlert('Username hanya boleh huruf kecil, angka, dan underscore!', 'error'); return; }
+  if (password.length < 6) { showAlert('Password minimal 6 karakter!', 'error'); return; }
+  if (password !== konfirmasi) { showAlert('Konfirmasi password tidak cocok!', 'error'); return; }
+  
+  btn.disabled = true;
+  btnText.innerHTML = '<div class="spinner"></div> Membuat akun admin...';
+  
+  const email = `${username}@banksantri.local`;
+  
+  try {
+    // 1. Buat akun di Firebase Auth pakai secondary app (agar tidak auto-login)
+    const secondaryApp = firebase.initializeApp(firebaseConfig, 'SetupApp' + Date.now());
+    const secondaryAuth = secondaryApp.auth();
+    
+    const userCred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    const uid = userCred.user.uid;
+    
+    // Logout dari secondary (biarkan main app tetap anonim)
+    await secondaryAuth.signOut();
+    
+    // 2. Simpan mapping username → email di Firestore
+    await db.collection('usernames').doc(username).set({
+      email: email,
+      uid: uid,
+      role: 'admin',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // 3. Simpan profile di Firestore
+    await db.collection('users').doc(uid).set({
+      uid: uid,
+      nama: nama,
+      username: username,
+      email: email,
+      role: 'admin',
+      aktif: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    showAlert('✅ Akun admin berhasil dibuat! Silakan login.', 'success');
+    btnText.innerHTML = '✅ Berhasil!';
+    
+    // Switch ke mode login
+    setTimeout(() => {
+      isSetupMode = false;
+      applyMode();
+      // Auto-isi username
+      document.getElementById('inputUsername').value = username;
+      document.getElementById('inputPassword').value = '';
+      document.getElementById('inputPassword').focus();
+      showAlert('Silakan login dengan username dan password Anda', 'success');
+      btn.disabled = false;
+      btnText.innerHTML = '🔓 Masuk sebagai Admin';
+    }, 1500);
+    
+  } catch (err) {
+    console.error('Setup error:', err);
+    let msg = 'Gagal membuat akun admin!';
+    if (err.code === 'auth/email-already-in-use') msg = 'Username sudah dipakai. Coba yang lain.';
+    else if (err.code === 'auth/weak-password') msg = 'Password terlalu lemah!';
+    else if (err.code === 'auth/network-request-failed') msg = 'Koneksi internet bermasalah!';
+    else if (err.code === 'permission-denied') msg = 'Akses Firestore ditolak. Cek Rules!';
+    
+    showAlert(msg, 'error');
+    btn.disabled = false;
+    btnText.innerHTML = '🛡️ Buat Akun Admin';
+  }
+}
+
+/* ============================================================
+   🔓 LOGIN (Admin / Santri)
+============================================================ */
+async function handleLogin() {
+  const username = document.getElementById('inputUsername').value.trim().toLowerCase();
+  const password = document.getElementById('inputPassword').value;
   const remember = document.getElementById('loginRemember').checked;
-  const btn = document.getElementById('btnLogin');
-  const btnText = document.getElementById('btnLoginText');
-  const alertEl = document.getElementById('loginAlert');
-  const pwdInput = document.getElementById('loginPassword');
+  const btn = document.getElementById('btnSubmit');
+  const btnText = document.getElementById('btnSubmitText');
+  const alertEl = document.getElementById('authAlert');
+  const pwdInput = document.getElementById('inputPassword');
   
   alertEl.classList.remove('show');
   pwdInput.classList.remove('error');
   
-  if (!email || !password) {
-    showLoginAlert('Email dan password wajib diisi!', 'error');
+  if (!username || !password) {
+    showAlert('Username dan password wajib diisi!', 'error');
     return;
   }
   
   btn.disabled = true;
   btnText.innerHTML = '<div class="spinner"></div> Memverifikasi...';
   
+  let email = null;
+  
+  // === STEP 1: Cari email dari username ===
+  try {
+    const usernameDoc = await db.collection('usernames').doc(username).get();
+    
+    if (!usernameDoc.exists) {
+      showAlert('Username tidak ditemukan!', 'error');
+      btn.disabled = false;
+      btnText.innerHTML = currentRole === 'admin' ? '🔓 Masuk sebagai Admin' : '🔓 Masuk sebagai Santri';
+      return;
+    }
+    
+    const data = usernameDoc.data();
+    email = data.email;
+    const role = data.role || 'santri';
+    
+    // === STEP 2: Cek role sesuai tab ===
+    if (role !== currentRole) {
+      if (currentRole === 'admin' && role === 'santri') {
+        showAlert('Ini akun Santri. Silakan pilih tab "Santri".', 'error');
+      } else {
+        showAlert('Ini akun Admin. Silakan pilih tab "Admin".', 'error');
+      }
+      btn.disabled = false;
+      btnText.innerHTML = currentRole === 'admin' ? '🔓 Masuk sebagai Admin' : '🔓 Masuk sebagai Santri';
+      return;
+    }
+    
+  } catch (err) {
+    console.error('Lookup error:', err);
+    showAlert('Gagal memverifikasi. Cek koneksi internet.', 'error');
+    btn.disabled = false;
+    btnText.innerHTML = currentRole === 'admin' ? '🔓 Masuk sebagai Admin' : '🔓 Masuk sebagai Santri';
+    return;
+  }
+  
+  // === STEP 3: Login Firebase ===
   try {
     const persistence = remember 
       ? firebase.auth.Auth.Persistence.LOCAL 
       : firebase.auth.Auth.Persistence.SESSION;
     await auth.setPersistence(persistence);
     await auth.signInWithEmailAndPassword(email, password);
-    showLoginAlert('Login berhasil! Mengalihkan...', 'success');
+    
+    showAlert('Login berhasil! Mengalihkan...', 'success');
     btnText.innerHTML = '✅ Berhasil!';
     // Redirect otomatis dari onAuthStateChanged
+    
   } catch (err) {
     console.error('Login error:', err);
-    let msg = 'Email atau password salah!';
-    if (err.code === 'auth/invalid-email') msg = 'Format email tidak valid!';
+    let msg = 'Password salah!';
+    if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'Password salah!';
     else if (err.code === 'auth/user-not-found') msg = 'Akun tidak ditemukan!';
-    else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'Email atau password salah!';
     else if (err.code === 'auth/too-many-requests') msg = 'Terlalu banyak percobaan. Coba nanti.';
     else if (err.code === 'auth/network-request-failed') msg = 'Koneksi internet bermasalah!';
-    else if (err.code === 'auth/operation-not-allowed') msg = 'Login Email/Password belum diaktifkan di Firebase!';
     
-    showLoginAlert(msg, 'error');
+    showAlert(msg, 'error');
     pwdInput.classList.add('error');
     setTimeout(() => pwdInput.classList.remove('error'), 500);
     btn.disabled = false;
-    btnText.innerHTML = '🔓 Masuk';
+    btnText.innerHTML = currentRole === 'admin' ? '🔓 Masuk sebagai Admin' : '🔓 Masuk sebagai Santri';
   }
 }
 
-function showLoginAlert(msg, type) {
-  const el = document.getElementById('loginAlert');
-  el.textContent = (type === 'error' ? '❌ ' : '✅ ') + msg;
+function showAlert(msg, type) {
+  const el = document.getElementById('authAlert');
+  el.textContent = (type === 'error' ? '❌ ' : type === 'success' ? '✅ ' : 'ℹ️ ') + msg;
   el.className = 'login-alert ' + type + ' show';
-}
-
-function togglePassword() {
-  const inp = document.getElementById('loginPassword');
-  const btn = document.getElementById('togglePassBtn');
-  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
-  else { inp.type = 'password'; btn.textContent = '👁️'; }
 }
 
 /* ============================================================
@@ -349,7 +686,6 @@ function toggleTheme() {
   localStorage.setItem('theme', next);
   document.getElementById('themeIcon').textContent = next === 'dark' ? '☀️' : '🌙';
 }
-
 (function initTheme() {
   const saved = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
