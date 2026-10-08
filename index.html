@@ -1330,7 +1330,7 @@ async function hapusUser(uid,username){
 
     <script>
 /* ============================================================
-   🪪 KARTU IDENTITAS — PUTIH + LIST HIJAU
+   🪪 KARTU IDENTITAS — PUTIH + LIST HIJAU (BIODATA BESAR)
 ============================================================ */
 function generateKartuHTML(s, compact = false) {
   const tglLahir = s.tglLahir 
@@ -1344,80 +1344,111 @@ function generateKartuHTML(s, compact = false) {
   const nik = s.nik || '-';
   const kk = s.kk || '-';
   
-  const w = compact ? '8.5cm' : '9.5cm';
-  const h = compact ? '5.4cm' : '6cm';
+  // Ukuran kartu (sedikit lebih tinggi untuk muat teks besar)
+  const w = compact ? '9cm' : '10cm';
+  const h = compact ? '5.8cm' : '6.5cm';
   const pad = compact ? '8px 10px' : '10px 14px';
-  const fotoW = compact ? '60px' : '70px';
-  const fotoH = compact ? '80px' : '93px';
-  const nameSize = compact ? '11px' : '13px';
-  const labelSize = compact ? '7px' : '8px';
-  const kopTitleSize = compact ? '9px' : '11px';
-  const kopSubSize = compact ? '6.5px' : '7.5px';
+  const fotoW = compact ? '62px' : '72px';
+  const fotoH = compact ? '82px' : '96px';
+  
+  // Font sizes — SEMUA DIPERBESAR & KONSISTEN
+  const kopTitleSize = compact ? '11px' : '13px';
+  const kopSubSize   = compact ? '7.5px' : '9px';
+  const judulSize    = compact ? '7px' : '8px';
+  const labelSize    = compact ? '9px' : '11px';   // Label (NAMA, NIK, dll)
+  const valueSize    = compact ? '10px' : '12px';  // Nilai biodata
+  const nameSize     = compact ? '13px' : '15px';  // Nama siswa & wali
   
   return `
     <div style="width:${w};height:${h};background:#ffffff;border:1px solid #cbd5e1;border-left:5px solid #059669;border-radius:8px;padding:${pad};color:#1e293b;position:relative;overflow:hidden;font-family:'Plus Jakarta Sans',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.08);box-sizing:border-box;display:flex;flex-direction:column;">
       
+      <!-- Watermark -->
       <div style="position:absolute;bottom:-20px;right:-15px;font-size:${compact?'70px':'90px'};opacity:.04;pointer-events:none;">🕌</div>
       
-      <!-- KOP -->
-      <div style="display:flex;align-items:center;gap:6px;padding-bottom:5px;border-bottom:1.5px solid #059669;margin-bottom:6px;">
-        <div style="width:${compact?'22px':'26px'};height:${compact?'22px':'26px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'12px':'14px'};flex-shrink:0;color:white;box-shadow:0 2px 4px rgba(5,150,105,.3);">🕌</div>
+      <!-- ========== KOP ========== -->
+      <div style="display:flex;align-items:center;gap:6px;padding-bottom:4px;border-bottom:1.5px solid #059669;margin-bottom:3px;">
+        <div style="width:${compact?'24px':'28px'};height:${compact?'24px':'28px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'13px':'15px'};flex-shrink:0;color:white;box-shadow:0 2px 4px rgba(5,150,105,.3);">🕌</div>
         <div style="flex:1;text-align:center;line-height:1.1;">
           <div style="font-size:${kopTitleSize};font-weight:800;color:#047857;letter-spacing:.5px;">ASRAMA PUTRA</div>
           <div style="font-size:${kopSubSize};font-weight:700;color:#059669;letter-spacing:.8px;">NURMILAD BOARDING SCHOOL</div>
-          <div style="font-size:${compact?'5.5px':'6.5px'};font-weight:600;color:#64748b;letter-spacing:.5px;margin-top:1px;">KARTU IDENTITAS SANTRI</div>
         </div>
-        <div style="width:${compact?'22px':'26px'};height:${compact?'22px':'26px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'11px':'13px'};flex-shrink:0;color:white;">📖</div>
+        <div style="width:${compact?'24px':'28px'};height:${compact?'24px':'28px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'12px':'14px'};flex-shrink:0;color:white;">📖</div>
       </div>
       
-      <!-- BODY -->
+      <!-- ========== JUDUL KARTU ========== -->
+      <div style="text-align:center;font-size:${judulSize};font-weight:700;color:#059669;letter-spacing:1.5px;padding:2px 0 4px;text-transform:uppercase;">
+        — KARTU IDENTITAS SANTRI —
+      </div>
+      
+      <!-- ========== BODY ========== -->
       <div style="display:flex;gap:${compact?'8px':'10px'};flex:1;min-height:0;">
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;">
-          <!-- NAMA -->
-          <div style="display:flex;gap:4px;margin-bottom:1px;line-height:1.1;">
-            <span style="min-width:${compact?'34px':'40px'};font-size:${labelSize};font-weight:700;color:#059669;">NAMA</span>
-            <span style="font-size:${nameSize};font-weight:800;color:#047857;letter-spacing:.2px;flex:1;word-break:break-word;">: ${namaKapital}</span>
+        
+        <!-- KIRI: BIODATA -->
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;">
+          
+          <!-- BIODATA -->
+          <div style="display:flex;flex-direction:column;gap:${compact?'2px':'3px'};">
+            
+            <!-- NAMA -->
+            <div style="display:flex;gap:4px;align-items:baseline;">
+              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">NAMA</span>
+              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.1;flex:1;word-break:break-word;">: ${namaKapital}</span>
+            </div>
+            
+            <!-- NIK -->
+            <div style="display:flex;gap:4px;align-items:baseline;">
+              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">NIK</span>
+              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;word-break:break-all;">: ${nik}</span>
+            </div>
+            
+            <!-- NO. KK -->
+            <div style="display:flex;gap:4px;align-items:baseline;">
+              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">NO. KK</span>
+              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;word-break:break-all;">: ${kk}</span>
+            </div>
+            
+            <!-- TTL -->
+            <div style="display:flex;gap:4px;align-items:baseline;">
+              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">TTL</span>
+              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;word-break:break-word;">: ${tempatKapital}, ${tglLahir}</span>
+            </div>
+            
+            <!-- JK -->
+            <div style="display:flex;gap:4px;align-items:baseline;">
+              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">JK</span>
+              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;">: ${jkText}</span>
+            </div>
+            
+            <!-- KAMAR -->
+            <div style="display:flex;gap:4px;align-items:baseline;">
+              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">KAMAR</span>
+              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;">: ${kamarKapital}</span>
+            </div>
+            
+            <!-- WALI -->
+            <div style="display:flex;gap:4px;align-items:baseline;">
+              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">WALI</span>
+              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.1;flex:1;word-break:break-word;">: ${waliKapital}</span>
+            </div>
+            
           </div>
-          <!-- DETAIL -->
-          <div style="font-size:${labelSize};line-height:1.5;color:#334155;">
-            <div style="display:flex;gap:4px;margin-bottom:1px;">
-              <span style="min-width:${compact?'34px':'40px'};font-weight:700;color:#059669;">NIK</span>
-              <span style="font-weight:600;">: ${nik}</span>
-            </div>
-            <div style="display:flex;gap:4px;margin-bottom:1px;">
-              <span style="min-width:${compact?'34px':'40px'};font-weight:700;color:#059669;">NO. KK</span>
-              <span style="font-weight:600;">: ${kk}</span>
-            </div>
-            <div style="display:flex;gap:4px;margin-bottom:1px;">
-              <span style="min-width:${compact?'34px':'40px'};font-weight:700;color:#059669;">TTL</span>
-              <span style="font-weight:600;flex:1;">: ${tempatKapital}, ${tglLahir}</span>
-            </div>
-            <div style="display:flex;gap:4px;margin-bottom:1px;">
-              <span style="min-width:${compact?'34px':'40px'};font-weight:700;color:#059669;">JK</span>
-              <span style="font-weight:600;">: ${jkText}</span>
-            </div>
-            <div style="display:flex;gap:4px;margin-bottom:1px;">
-              <span style="min-width:${compact?'34px':'40px'};font-weight:700;color:#059669;">KAMAR</span>
-              <span style="font-weight:600;">: ${kamarKapital}</span>
-            </div>
-          </div>
+          
         </div>
         
-        <!-- FOTO 3x4 -->
-        <div style="width:${fotoW};flex-shrink:0;display:flex;flex-direction:column;align-items:center;">
-          <div style="width:${fotoW};height:${fotoH};background:#f1f5f9;border:2px solid #059669;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:${compact?'28px':'34px'};color:#94a3b8;overflow:hidden;box-shadow:0 2px 6px rgba(5,150,105,.15);">
+        <!-- KANAN: FOTO 3x4 -->
+        <div style="width:${fotoW};flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="width:${fotoW};height:${fotoH};background:#f1f5f9;border:2px solid #059669;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:${compact?'30px':'36px'};color:#94a3b8;overflow:hidden;box-shadow:0 2px 6px rgba(5,150,105,.15);">
             ${s.foto ? `<img src="${s.foto}" style="width:100%;height:100%;object-fit:cover;">` : `${s.jk === 'P' ? '👩' : '👨'}`}
           </div>
-          <div style="font-size:${compact?'5.5px':'6.5px'};text-align:center;margin-top:3px;color:#059669;font-weight:700;letter-spacing:.3px;">FOTO 3×4</div>
+          <div style="font-size:${compact?'6px':'7px'};text-align:center;margin-top:4px;color:#059669;font-weight:700;letter-spacing:.3px;">FOTO 3×4</div>
         </div>
+        
       </div>
       
-      <!-- FOOTER -->
-      <div style="margin-top:auto;padding-top:4px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;font-size:${compact?'5.5px':'6.5px'};color:#64748b;font-weight:600;gap:6px;">
-        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">
-          <strong style="color:#059669;">WALI:</strong> ${waliKapital}
-        </span>
-        <span style="white-space:nowrap;">${s.hp || '-'}</span>
+      <!-- ========== FOOTER ========== -->
+      <div style="margin-top:4px;padding-top:4px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;font-size:${compact?'6px':'7px'};color:#64748b;font-weight:600;gap:6px;">
+        <span style="white-space:nowrap;">📱 ${s.hp || '-'}</span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${(s.alamat || '-').substring(0, 30)}${(s.alamat || '').length > 30 ? '...' : ''}</span>
       </div>
       
     </div>
