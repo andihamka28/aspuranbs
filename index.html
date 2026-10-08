@@ -329,6 +329,7 @@ tbody tr:last-child td{border-bottom:none}
       <div class="nav-item admin-only" data-page="kamar"><span class="ico">🏠</span> Kamar Asrama</div>
 
       <div class="nav-section santri-only hidden">Keuangan Saya</div>
+      <div class="nav-item santri-only hidden" data-page="cetak-id-saya"><span class="ico">🪪</span> Kartu Identitas</div>
       <div class="nav-item santri-only hidden" data-page="saldo-saya"><span class="ico">💎</span> Saldo Sekarang</div>
       <div class="nav-item santri-only hidden" data-page="riwayat-saya"><span class="ico">📜</span> Riwayat Transaksi</div>
 
@@ -372,6 +373,7 @@ tbody tr:last-child td{border-bottom:none}
       </div>
 
       <div class="nav-section admin-only">Sistem</div>
+      <div class="nav-item admin-only" data-page="cetak-id"><span class="ico">🪪</span> Cetak Identitas</div>
       <div class="nav-item admin-only" data-page="users"><span class="ico">🔑</span> Kelola User</div>
       <div class="nav-item admin-only" data-page="pengaturan"><span class="ico">⚙️</span> Pengaturan</div>
     </nav>
@@ -502,29 +504,34 @@ tbody tr:last-child td{border-bottom:none}
           <div class="card-header"><div class="card-title" id="formSantriTitle">➕ Tambah Santri</div></div>
           <input type="hidden" id="santriEditId">
           <div class="form-grid">
-            <div class="form-field"><label>Nama Santri *</label><input id="santriNama" placeholder="Contoh: Ahmad Fauzi"></div>
-            <div class="form-field"><label>Kamar / Asrama</label><input id="santriKamar" placeholder="Contoh: Kamar A-01"></div>
-            <div class="form-field"><label>No. HP Wali</label><input id="santriHP" placeholder="628xxxxxxxxxx"></div>
-            <div class="form-field"><label>Tanggal Masuk</label><input type="date" id="santriTgl"></div>
-            <div class="form-field"><label>Asal Daerah</label><input id="santriAsal" placeholder="Contoh: Bandung"></div>
-            <div class="form-field"><label>Nama Wali</label><input id="santriWali" placeholder="Nama orang tua/wali"></div>
-          </div>
+  <div class="form-field"><label>Nama Santri *</label><input id="santriNama" placeholder="Contoh: Ahmad Fauzi"></div>
+  <div class="form-field"><label>NIK</label><input id="santriNIK" placeholder="16 digit NIK" maxlength="16"></div>
+  <div class="form-field"><label>No. KK</label><input id="santriKK" placeholder="16 digit No. KK" maxlength="16"></div>
+  <div class="form-field"><label>Tempat Lahir</label><input id="santriTempatLahir" placeholder="Contoh: Bandung"></div>
+  <div class="form-field"><label>Tanggal Lahir</label><input type="date" id="santriTglLahir"></div>
+  <div class="form-field"><label>Jenis Kelamin</label><select id="santriJK"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+  <div class="form-field"><label>Kamar / Asrama</label><input id="santriKamar" placeholder="Contoh: Kamar A-01"></div>
+  <div class="form-field"><label>Asal Daerah</label><input id="santriAsal" placeholder="Contoh: Bandung"></div>
+  <div class="form-field" style="grid-column:1/-1;"><label>Alamat Lengkap</label><input id="santriAlamat" placeholder="Jl. Contoh No. 123, RT/RW, Kel, Kec, Kota"></div>
+  <div class="form-field"><label>Nama Wali</label><input id="santriWali" placeholder="Nama orang tua/wali"></div>
+  <div class="form-field"><label>No. HP Wali</label><input id="santriHP" placeholder="628xxxxxxxxxx"></div>
+  <div class="form-field"><label>Tanggal Masuk</label><input type="date" id="santriTgl"></div>
+</div>
           <div style="display:flex;gap:10px;"><button class="btn btn-primary" onclick="simpanSantri()">💾 Simpan</button><button class="btn btn-ghost" onclick="resetFormSantri()">Batal</button></div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">📋 Daftar Santri</div></div>
           <div class="filter-bar">
-            <div class="form-field"><label>Cari Santri</label><input id="cariSantri" placeholder="Ketik nama..." oninput="renderSantri()"></div>
-            <div class="form-field"><label>Filter Kamar</label><select id="filterKamar" onchange="renderSantri()"><option value="">Semua Kamar</option></select></div>
-            <div class="form-field"><label>Filter Tabungan</label>
-              <select id="filterTabungan" onchange="renderSantri()">
-                <option value="default">💰 Hanya yang punya tabungan</option>
-                <option value="ada">💰 Punya Tabungan</option>
-                <option value="tidak">❌ Tanpa Tabungan</option>
-                <option value="">Semua Santri</option>
-              </select>
-            </div>
-          </div>
+  <div class="form-field"><label>Cari Santri</label><input id="cariSantri" placeholder="Ketik nama..." oninput="renderSantri()"></div>
+  <div class="form-field"><label>Filter Kamar</label><select id="filterKamar" onchange="renderSantri()"><option value="">Semua Kamar</option></select></div>
+  <div class="form-field"><label>Urutkan</label>
+    <select id="urutSantri" onchange="renderSantri()">
+      <option value="nama">Nama A-Z</option>
+      <option value="kamar">Kamar</option>
+      <option value="terbaru">Terbaru Daftar</option>
+    </select>
+  </div>
+</div>
           <div id="santriTable"></div>
         </div>
       </div>
@@ -761,6 +768,28 @@ tbody tr:last-child td{border-bottom:none}
         <div class="card"><div class="card-header"><div class="card-title">📋 Daftar Pengumuman</div></div><div id="pengumumanList"></div></div>
       </div>
 
+      <!-- CETAK IDENTITAS (ADMIN) -->
+<div class="page admin-only" id="page-cetak-id">
+  <div class="page-header"><h2>🪪 Cetak Identitas Santri</h2><p>Pilih santri untuk mencetak kartu identitas</p></div>
+  <div class="card">
+    <div class="filter-bar">
+      <div class="form-field"><label>Pilih Santri</label><select id="pilihCetakId" onchange="previewCetakId()"></select></div>
+      <div class="form-field"><label>Atau Cetak Semua</label><button class="btn btn-info" onclick="cetakSemuaId()">🖨️ Cetak Semua Kartu</button></div>
+    </div>
+    <div id="previewIdContainer"></div>
+  </div>
+</div>
+
+<!-- KARTU IDENTITAS SAYA (SANTRI) -->
+<div class="page santri-only hidden" id="page-cetak-id-saya">
+  <div class="page-header"><h2>🪪 Kartu Identitas Saya</h2><p>Kartu identitas digital Anda</p></div>
+  <div class="card">
+    <div id="kartuIdSaya"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+      <button class="btn btn-info" onclick="cetakKartuIdSaya()">🖨️ Cetak Kartu</button>
+    </div>
+  </div>
+</div>
       <!-- KELOLA USER -->
       <div class="page admin-only" id="page-users">
         <div class="page-header"><h2>🔑 Kelola User</h2><p>Buat akun login admin & santri</p></div>
@@ -965,6 +994,7 @@ function goToPage(page){
   if(isAdmin)refreshAll();
   else if(page==='saldo-saya')renderSaldoSaya();
   else if(page==='riwayat-saya')renderRiwayatSaya();
+  else if(page==='cetak-id-saya')renderKartuIdSaya();
   window.scrollTo({top:0,behavior:'smooth'});
   document.getElementById('userDropdown').classList.remove('show');
 }
@@ -1004,33 +1034,24 @@ async function submitChangePassword(){
 
 function simpanSantri(){
   const id=document.getElementById('santriEditId').value;
-  const nama=document.getElementById('santriNama').value.trim();
-  const kamar=document.getElementById('santriKamar').value.trim();
-  const hp=document.getElementById('santriHP').value.trim();
-  const tgl=document.getElementById('santriTgl').value;
-  const asal=document.getElementById('santriAsal').value.trim();
-  const wali=document.getElementById('santriWali').value.trim();
-  if(!nama){showToast('Nama santri wajib diisi!','error');return}
-  const data={nama,kamar,hp,tgl,asal,wali};
+  const data={
+    nama:document.getElementById('santriNama').value.trim(),
+    nik:document.getElementById('santriNIK').value.trim(),
+    kk:document.getElementById('santriKK').value.trim(),
+    tempatLahir:document.getElementById('santriTempatLahir').value.trim(),
+    tglLahir:document.getElementById('santriTglLahir').value,
+    jk:document.getElementById('santriJK').value,
+    kamar:document.getElementById('santriKamar').value.trim(),
+    asal:document.getElementById('santriAsal').value.trim(),
+    alamat:document.getElementById('santriAlamat').value.trim(),
+    wali:document.getElementById('santriWali').value.trim(),
+    hp:document.getElementById('santriHP').value.trim(),
+    tgl:document.getElementById('santriTgl').value
+  };
+  if(!data.nama){showToast('Nama santri wajib diisi!','error');return}
   const promise=id?db.collection('santri').doc(id).update(data):db.collection('santri').add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
   promise.then(()=>{resetFormSantri();showToast('Santri disimpan!')}).catch(err=>showToast('Gagal menyimpan','error'));
-}
-function editSantri(id){const s=santriList.find(x=>x.id===id);if(!s)return;document.getElementById('santriEditId').value=s.id;document.getElementById('santriNama').value=s.nama;document.getElementById('santriKamar').value=s.kamar||'';document.getElementById('santriHP').value=s.hp||'';document.getElementById('santriTgl').value=s.tgl||'';document.getElementById('santriAsal').value=s.asal||'';document.getElementById('santriWali').value=s.wali||'';document.getElementById('formSantriTitle').textContent='✏️ Edit Santri';window.scrollTo({top:0,behavior:'smooth'})}
-function hapusSantri(id){if(!confirm('Hapus santri ini?'))return;db.collection('santri').doc(id).delete().then(()=>showToast('Santri dihapus')).catch(err=>showToast('Gagal','error'))}
-function resetFormSantri(){document.getElementById('santriEditId').value='';document.getElementById('santriNama').value='';document.getElementById('santriKamar').value='';document.getElementById('santriHP').value='';document.getElementById('santriTgl').value=today();document.getElementById('santriAsal').value='';document.getElementById('santriWali').value='';document.getElementById('formSantriTitle').textContent='➕ Tambah Santri'}
-
-function simpanKamar(){
-  const id=document.getElementById('kamarEditId').value;
-  const nama=document.getElementById('kamarNama').value.trim();
-  const kapasitas=parseInt(document.getElementById('kamarKapasitas').value);
-  const gedung=document.getElementById('kamarGedung').value.trim();
-  const ket=document.getElementById('kamarKet').value.trim();
-  if(!nama||!kapasitas){showToast('Nama & kapasitas wajib!','error');return}
-  const data={nama,kapasitas,gedung,ket};
-  const promise=id?db.collection('kamar').doc(id).update(data):db.collection('kamar').add({...data,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-  promise.then(()=>{resetFormKamar();showToast('Kamar disimpan!')}).catch(err=>showToast('Gagal','error'));
-}
-function editKamar(id){const k=kamarList.find(x=>x.id===id);if(!k)return;document.getElementById('kamarEditId').value=k.id;document.getElementById('kamarNama').value=k.nama;document.getElementById('kamarKapasitas').value=k.kapasitas;document.getElementById('kamarGedung').value=k.gedung||'';document.getElementById('kamarKet').value=k.ket||'';document.getElementById('formKamarTitle').textContent='✏️ Edit Kamar';window.scrollTo({top:0,behavior:'smooth'})}
+}function editKamar(id){const k=kamarList.find(x=>x.id===id);if(!k)return;document.getElementById('kamarEditId').value=k.id;document.getElementById('kamarNama').value=k.nama;document.getElementById('kamarKapasitas').value=k.kapasitas;document.getElementById('kamarGedung').value=k.gedung||'';document.getElementById('kamarKet').value=k.ket||'';document.getElementById('formKamarTitle').textContent='✏️ Edit Kamar';window.scrollTo({top:0,behavior:'smooth'})}
 function hapusKamar(id){if(!confirm('Hapus kamar ini?'))return;db.collection('kamar').doc(id).delete().then(()=>showToast('Kamar dihapus')).catch(err=>showToast('Gagal','error'))}
 function resetFormKamar(){document.getElementById('kamarEditId').value='';document.getElementById('kamarNama').value='';document.getElementById('kamarKapasitas').value='';document.getElementById('kamarGedung').value='';document.getElementById('kamarKet').value='';document.getElementById('formKamarTitle').textContent='➕ Tambah Kamar'}
 
@@ -1304,36 +1325,144 @@ async function hapusUser(uid,username){
 }
 </script>
 <script>
+  /* ============ CETAK IDENTITAS ============ */
+function generateKartuHTML(s){
+  const tglLahir=s.tglLahir?new Date(s.tglLahir).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'-';
+  const jkText=s.jk==='P'?'Perempuan':'Laki-laki';
+  return `
+    <div style="width:340px;height:214px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border-radius:14px;padding:18px;color:white;box-shadow:0 8px 24px rgba(16,185,129,.3);position:relative;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;">
+      <div style="position:absolute;top:-40%;right:-10%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);"></div>
+      <div style="position:relative;z-index:1;">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
+          <div>
+            <div style="font-size:9px;opacity:.85;font-weight:600;text-transform:uppercase;letter-spacing:1px;">KARTU IDENTITAS SANTRI</div>
+            <div style="font-size:14px;font-weight:800;margin-top:2px;">${pengaturan.namaPesantren||'Asrama Putra'}</div>
+          </div>
+          <div style="font-size:32px;">🕌</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <div style="width:70px;height:88px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;border:2px solid rgba(255,255,255,.3);">
+            ${s.jk==='P'?'👩':'👨'}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:16px;font-weight:800;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.nama}</div>
+            <div style="font-size:10px;opacity:.9;margin-bottom:3px;"><strong>NIK:</strong> ${s.nik||'-'}</div>
+            <div style="font-size:10px;opacity:.9;margin-bottom:3px;"><strong>No. KK:</strong> ${s.kk||'-'}</div>
+            <div style="font-size:10px;opacity:.9;margin-bottom:3px;"><strong>TTL:</strong> ${s.tempatLahir||'-'}, ${tglLahir}</div>
+            <div style="font-size:10px;opacity:.9;margin-bottom:3px;"><strong>JK:</strong> ${jkText}</div>
+            <div style="font-size:10px;opacity:.9;"><strong>Kamar:</strong> ${s.kamar||'-'}</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.2);font-size:9px;opacity:.85;display:flex;justify-content:space-between;">
+          <span>Wali: ${s.wali||'-'}</span>
+          <span>${s.hp||''}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function cetakKartuId(santriId){
+  const s=santriList.find(x=>x.id===santriId);if(!s){showToast('Santri tidak ditemukan','error');return}
+  const win=window.open('','','width=800,height=600');
+  win.document.write(`<html><head><title>Kartu Identitas - ${s.nama}</title>
+    <style>body{margin:0;padding:40px;background:#f5f7fb;font-family:'Plus Jakarta Sans',sans-serif;display:flex;justify-content:center;}
+    @media print{body{padding:0;background:white;}}</style></head>
+    <body>${generateKartuHTML(s)}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),400);
+}
+
+function previewCetakId(){
+  const id=document.getElementById('pilihCetakId').value;
+  const el=document.getElementById('previewIdContainer');
+  if(!id){el.innerHTML='';return}
+  const s=santriList.find(x=>x.id===id);if(!s)return;
+  el.innerHTML=`
+    <div style="padding:24px;background:var(--bg);border-radius:12px;text-align:center;">
+      <div style="display:inline-block;">${generateKartuHTML(s)}</div>
+      <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-info" onclick="cetakKartuId('${s.id}')">🖨️ Cetak Kartu Ini</button>
+      </div>
+    </div>`;
+}
+
+async function cetakSemuaId(){
+  if(santriList.length===0){showToast('Belum ada santri','error');return}
+  if(!confirm(`Cetak ${santriList.length} kartu identitas?`))return;
+  const win=window.open('','','width=900,height=700');
+  const cards=santriList.map(s=>`<div style="page-break-after:always;display:flex;justify-content:center;padding:20px;">${generateKartuHTML(s)}</div>`).join('');
+  win.document.write(`<html><head><title>Semua Kartu Identitas</title>
+    <style>body{margin:0;padding:20px;background:#f5f7fb;font-family:'Plus Jakarta Sans',sans-serif;}
+    @media print{body{padding:0;background:white;}}</style></head>
+    <body>${cards}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
+}
+
+function renderKartuIdSaya(){
+  const el=document.getElementById('kartuIdSaya');if(!el)return;
+  const mySantriId=userProfile?.santriId;
+  let myData=mySantriId?santriList.find(s=>s.id===mySantriId):null;
+  if(!myData&&userProfile?.nama)myData=santriList.find(s=>s.nama.toLowerCase()===userProfile.nama.toLowerCase());
+  if(!myData){el.innerHTML=`<div class="empty"><div class="empty-icon">🪪</div><p>Akun Anda belum dikaitkan dengan data santri</p></div>`;return}
+  el.innerHTML=`
+    <div style="padding:24px;background:var(--bg);border-radius:12px;text-align:center;">
+      <div style="display:inline-block;">${generateKartuHTML(myData)}</div>
+    </div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-header"><div class="card-title">📋 Data Diri</div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+        <div><small style="color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;">Nama</small><div style="font-size:15px;font-weight:700;">${myData.nama}</div></div>
+        <div><small style="color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;">NIK</small><div style="font-size:15px;font-weight:700;">${myData.nik||'-'}</div></div>
+        <div><small style="color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;">No. KK</small><div style="font-size:15px;font-weight:700;">${myData.kk||'-'}</div></div>
+        <div><small style="color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;">Tempat, Tgl Lahir</small><div style="font-size:15px;font-weight:700;">${myData.tempatLahir||'-'}, ${myData.tglLahir?new Date(myData.tglLahir).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'-'}</div></div>
+        <div style="grid-column:1/-1;"><small style="color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;">Alamat</small><div style="font-size:15px;font-weight:700;">${myData.alamat||'-'}</div></div>
+        <div><small style="color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;">Wali</small><div style="font-size:15px;font-weight:700;">${myData.wali||'-'}</div></div>
+        <div><small style="color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase;">Kamar</small><div style="font-size:15px;font-weight:700;">${myData.kamar||'-'}</div></div>
+      </div>
+    </div>`;
+}
+
+function cetakKartuIdSaya(){
+  const mySantriId=userProfile?.santriId;
+  let myData=mySantriId?santriList.find(s=>s.id===mySantriId):null;
+  if(!myData&&userProfile?.nama)myData=santriList.find(s=>s.nama.toLowerCase()===userProfile.nama.toLowerCase());
+  if(!myData){showToast('Data santri tidak ditemukan','error');return}
+  cetakKartuId(myData.id);
+}
 function renderSantri(){
   const cari=(document.getElementById('cariSantri')?.value||'').toLowerCase();
   const filterKamarVal=document.getElementById('filterKamar')?.value||'';
-  const filterTabungan=document.getElementById('filterTabungan')?.value||'default';
+  const urut=document.getElementById('urutSantri')?.value||'nama';
   let data=santriList.filter(s=>s.nama.toLowerCase().includes(cari));
   if(filterKamarVal)data=data.filter(s=>s.kamar===filterKamarVal);
-  if(filterTabungan==='ada'){data=data.filter(s=>hitungSaldo(s.id)!==0||transaksiList.some(t=>t.santriId===s.id))}
-  else if(filterTabungan==='tidak'){data=data.filter(s=>hitungSaldo(s.id)===0&&!transaksiList.some(t=>t.santriId===s.id))}
-  else if(filterTabungan==='default'){data=data.filter(s=>hitungSaldo(s.id)!==0||transaksiList.some(t=>t.santriId===s.id))}
+  if(urut==='nama')data.sort((a,b)=>a.nama.localeCompare(b.nama));
+  else if(urut==='kamar')data.sort((a,b)=>(a.kamar||'').localeCompare(b.kamar||''));
+  else if(urut==='terbaru')data.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
   const el=document.getElementById('santriTable');if(!el)return;
-  if(data.length===0){el.innerHTML=`<div class="empty"><div class="empty-icon">👥</div><p>Tidak ada santri yang cocok dengan filter</p></div>`;return}
+  if(data.length===0){el.innerHTML=`<div class="empty"><div class="empty-icon">👥</div><p>Belum ada santri</p></div>`;return}
   el.innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>No</th><th>Nama</th><th>Kamar</th><th>No. HP Wali</th><th>Saldo</th><th>Poin</th><th>Aksi</th></tr></thead>
+    <thead><tr><th>No</th><th>Nama & NIK</th><th>Kamar</th><th>Tgl Lahir</th><th>Wali & HP</th><th>Saldo</th><th>Poin</th><th>Aksi</th></tr></thead>
     <tbody>${data.map((s,i)=>{
       const saldo=hitungSaldo(s.id);const poin=hitungPoinSantri(s.id);
-      const poinClass=poin>0?'text-negatif':'text-positif';
+      const tglLahir=s.tglLahir?new Date(s.tglLahir).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'-';
       return `<tr>
         <td>${i+1}</td>
-        <td><strong>${s.nama}</strong>${s.asal?`<br><small style="color:var(--text-muted)">${s.asal}</small>`:''}</td>
-        <td>${s.kamar||'-'}</td><td>${s.hp||'-'}</td>
+        <td><strong>${s.nama}</strong>${s.nik?`<br><small style="color:var(--text-muted)">NIK: ${s.nik}</small>`:''}</td>
+        <td>${s.kamar||'-'}</td>
+        <td>${tglLahir}</td>
+        <td>${s.wali||'-'}${s.hp?`<br><small style="color:var(--text-muted)">${s.hp}</small>`:''}</td>
         <td class="${saldo>=0?'text-positif':'text-negatif'}">${rupiah(saldo)}</td>
-        <td class="${poinClass}">${poin>0?'⚠️ '+poin:'✅ 0'}</td>
-        <td><div style="display:flex;gap:6px;">
+        <td class="${poin>0?'text-negatif':'text-positif'}">${poin>0?'⚠️ '+poin:'✅ 0'}</td>
+        <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="btn btn-info btn-sm btn-icon" onclick="cetakKartuId('${s.id}')" title="Cetak ID">🪪</button>
           <button class="btn btn-warning btn-sm btn-icon" onclick="editSantri('${s.id}')">✏️</button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="hapusSantri('${s.id}')">🗑️</button>
         </div></td>
       </tr>`;
     }).join('')}</tbody></table></div>`;
 }
-
 function renderKamar(){
   const el=document.getElementById('kamarGrid');if(!el)return;
   if(kamarList.length===0){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏠</div><p>Belum ada kamar</p></div>`;return}
@@ -1579,19 +1708,24 @@ function renderLaporan(){
 function renderSaldo(){
   const cari=(document.getElementById('cariSaldo')?.value||'').toLowerCase();
   const urut=document.getElementById('urutSaldo')?.value||'nama';
-  let data=santriList.filter(s=>s.nama.toLowerCase().includes(cari)).map(s=>({...s,saldo:hitungSaldo(s.id)}));
+  // ⚠️ HANYA tampilkan santri dengan saldo ≠ 0
+  let data=santriList
+    .map(s=>({...s,saldo:hitungSaldo(s.id)}))
+    .filter(s=>s.saldo!==0)
+    .filter(s=>s.nama.toLowerCase().includes(cari));
   if(urut==='nama')data.sort((a,b)=>a.nama.localeCompare(b.nama));
   else if(urut==='saldo-desc')data.sort((a,b)=>b.saldo-a.saldo);
   else if(urut==='saldo-asc')data.sort((a,b)=>a.saldo-b.saldo);
   const el=document.getElementById('saldoGrid');if(!el)return;
-  if(data.length===0){el.innerHTML=`<div class="empty"><div class="empty-icon">🏦</div><p>Belum ada santri</p></div>`;return}
+  if(data.length===0){el.innerHTML=`<div class="empty"><div class="empty-icon">🏦</div><p>Belum ada santri yang memiliki saldo</p></div>`;return}
   el.innerHTML=`<div class="grid-cards">${data.map(s=>{
     const trx=transaksiList.filter(t=>t.santriId===s.id);
     const masuk=trx.filter(t=>t.jenis==='masuk').reduce((a,b)=>a+b.jumlah,0);
     const keluar=trx.filter(t=>t.jenis==='keluar').reduce((a,b)=>a+b.jumlah,0);
     const poin=hitungPoinSantri(s.id);
     return `<div class="info-card ${s.saldo>=0?'border-top-green':'border-top-red'}">
-      <h4>👤 ${s.nama}</h4><div class="meta"><span>🏠 ${s.kamar||'-'}</span>${s.asal?`<span>📍 ${s.asal}</span>`:''}</div>
+      <h4>👤 ${s.nama}</h4>
+      <div class="meta"><span>🏠 ${s.kamar||'-'}</span>${s.asal?`<span>📍 ${s.asal}</span>`:''}</div>
       <div class="saldo-big ${s.saldo>=0?'text-positif':'text-negatif'}">${rupiah(s.saldo)}</div>
       <div style="font-size:11px;color:var(--text-muted);display:flex;gap:14px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;">
         <span>📥 <strong style="color:var(--primary)">${rupiah(masuk)}</strong></span>
@@ -1600,7 +1734,7 @@ function renderSaldo(){
       </div></div>`;
   }).join('')}</div>`;
 }
-
+  
 function renderKegiatan(){
   const el=document.getElementById('kegiatanGrid');if(!el)return;
   if(kegiatanList.length===0){el.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📅</div><p>Belum ada kegiatan</p></div>`;return}
@@ -1858,6 +1992,11 @@ function refreshAll(){
     if(document.getElementById('page-riwayat-saya')?.classList.contains('active'))renderRiwayatSaya();
     return;
   }
+  // Dropdown pilih cetak ID
+const pilihCetak=document.getElementById('pilihCetakId');
+if(pilihCetak){
+  pilihCetak.innerHTML='<option value="">-- Pilih Santri --</option>'+santriList.map(s=>`<option value="${s.id}">${s.nama}${s.kamar?' - '+s.kamar:''}</option>`).join('');
+}
   const opts=santriList.map(s=>`<option value="${s.id}">${s.nama}${s.kamar?' - '+s.kamar:''}</option>`).join('');
   ['setorSantri','keluarSantri','piketPetugas1','piketPetugas2','newUserSantriId','pelanggaranSantri','filterPelanggaranSantri'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.innerHTML='<option value="">-- Pilih Santri --</option>'+opts;
