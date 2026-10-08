@@ -1330,7 +1330,7 @@ async function hapusUser(uid,username){
 
     <script>
 /* ============================================================
-   🪪 KARTU IDENTITAS — PUTIH + LIST HIJAU (BIODATA BESAR)
+   🪪 KARTU IDENTITAS — PUTIH + LIST HIJAU (FINAL)
 ============================================================ */
 function generateKartuHTML(s, compact = false) {
   const tglLahir = s.tglLahir 
@@ -1344,20 +1344,20 @@ function generateKartuHTML(s, compact = false) {
   const nik = s.nik || '-';
   const kk = s.kk || '-';
   
-  // Ukuran kartu (sedikit lebih tinggi untuk muat teks besar)
+  // Ukuran kartu
   const w = compact ? '9cm' : '10cm';
   const h = compact ? '5.8cm' : '6.5cm';
   const pad = compact ? '8px 10px' : '10px 14px';
   const fotoW = compact ? '62px' : '72px';
   const fotoH = compact ? '82px' : '96px';
   
-  // Font sizes — SEMUA DIPERBESAR & KONSISTEN
+  // Font sizes — SEMUA KONSISTEN
   const kopTitleSize = compact ? '11px' : '13px';
   const kopSubSize   = compact ? '7.5px' : '9px';
   const judulSize    = compact ? '7px' : '8px';
-  const labelSize    = compact ? '9px' : '11px';   // Label (NAMA, NIK, dll)
-  const valueSize    = compact ? '10px' : '12px';  // Nilai biodata
-  const nameSize     = compact ? '13px' : '15px';  // Nama siswa & wali
+  const labelSize    = compact ? '8px' : '10px';   // Label biodata
+  const valueSize    = compact ? '9px' : '11px';   // Nilai biodata
+  const nameSize     = compact ? '10px' : '12px';  // Nama siswa & wali (DIPERKECIL)
   
   return `
     <div style="width:${w};height:${h};background:#ffffff;border:1px solid #cbd5e1;border-left:5px solid #059669;border-radius:8px;padding:${pad};color:#1e293b;position:relative;overflow:hidden;font-family:'Plus Jakarta Sans',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.08);box-sizing:border-box;display:flex;flex-direction:column;">
@@ -1365,7 +1365,7 @@ function generateKartuHTML(s, compact = false) {
       <!-- Watermark -->
       <div style="position:absolute;bottom:-20px;right:-15px;font-size:${compact?'70px':'90px'};opacity:.04;pointer-events:none;">🕌</div>
       
-      <!-- ========== KOP ========== -->
+      <!-- KOP -->
       <div style="display:flex;align-items:center;gap:6px;padding-bottom:4px;border-bottom:1.5px solid #059669;margin-bottom:3px;">
         <div style="width:${compact?'24px':'28px'};height:${compact?'24px':'28px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'13px':'15px'};flex-shrink:0;color:white;box-shadow:0 2px 4px rgba(5,150,105,.3);">🕌</div>
         <div style="flex:1;text-align:center;line-height:1.1;">
@@ -1375,24 +1375,23 @@ function generateKartuHTML(s, compact = false) {
         <div style="width:${compact?'24px':'28px'};height:${compact?'24px':'28px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'12px':'14px'};flex-shrink:0;color:white;">📖</div>
       </div>
       
-      <!-- ========== JUDUL KARTU ========== -->
+      <!-- JUDUL KARTU -->
       <div style="text-align:center;font-size:${judulSize};font-weight:700;color:#059669;letter-spacing:1.5px;padding:2px 0 4px;text-transform:uppercase;">
         — KARTU IDENTITAS SANTRI —
       </div>
       
-      <!-- ========== BODY ========== -->
+      <!-- BODY -->
       <div style="display:flex;gap:${compact?'8px':'10px'};flex:1;min-height:0;">
         
         <!-- KIRI: BIODATA -->
         <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;">
           
-          <!-- BIODATA -->
           <div style="display:flex;flex-direction:column;gap:${compact?'2px':'3px'};">
             
             <!-- NAMA -->
             <div style="display:flex;gap:4px;align-items:baseline;">
               <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">NAMA</span>
-              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.1;flex:1;word-break:break-word;">: ${namaKapital}</span>
+              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.15;flex:1;word-break:break-word;">: ${namaKapital}</span>
             </div>
             
             <!-- NIK -->
@@ -1428,7 +1427,7 @@ function generateKartuHTML(s, compact = false) {
             <!-- WALI -->
             <div style="display:flex;gap:4px;align-items:baseline;">
               <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">WALI</span>
-              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.1;flex:1;word-break:break-word;">: ${waliKapital}</span>
+              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.15;flex:1;word-break:break-word;">: ${waliKapital}</span>
             </div>
             
           </div>
@@ -1445,7 +1444,7 @@ function generateKartuHTML(s, compact = false) {
         
       </div>
       
-      <!-- ========== FOOTER ========== -->
+      <!-- FOOTER -->
       <div style="margin-top:4px;padding-top:4px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;font-size:${compact?'6px':'7px'};color:#64748b;font-weight:600;gap:6px;">
         <span style="white-space:nowrap;">📱 ${s.hp || '-'}</span>
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${(s.alamat || '-').substring(0, 30)}${(s.alamat || '').length > 30 ? '...' : ''}</span>
@@ -1454,7 +1453,6 @@ function generateKartuHTML(s, compact = false) {
     </div>
   `;
 }
-
 function cetakKartuId(santriId){
   const s=santriList.find(x=>x.id===santriId);if(!s){showToast('Santri tidak ditemukan','error');return}
   const win=window.open('','','width=800,height=600');
