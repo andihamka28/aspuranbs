@@ -1330,7 +1330,7 @@ async function hapusUser(uid,username){
 
     <script>
 /* ============================================================
-   🪪 KARTU IDENTITAS — PUTIH + LIST HIJAU (FINAL)
+   🪪 KARTU IDENTITAS — BIODATA RAPI (RATA KIRI + TITIK DUA SEJAJAR)
 ============================================================ */
 function generateKartuHTML(s, compact = false) {
   const tglLahir = s.tglLahir 
@@ -1351,18 +1351,29 @@ function generateKartuHTML(s, compact = false) {
   const fotoW = compact ? '62px' : '72px';
   const fotoH = compact ? '82px' : '96px';
   
-  // Font sizes — SEMUA KONSISTEN
+  // Font sizes
   const kopTitleSize = compact ? '11px' : '13px';
   const kopSubSize   = compact ? '7.5px' : '9px';
   const judulSize    = compact ? '7px' : '8px';
-  const labelSize    = compact ? '8px' : '10px';   // Label biodata
-  const valueSize    = compact ? '9px' : '11px';   // Nilai biodata
-  const nameSize     = compact ? '10px' : '12px';  // Nama siswa & wali (DIPERKECIL)
+  const labelSize    = compact ? '8px' : '10px';
+  const valueSize    = compact ? '9px' : '11px';
+  const nameSize     = compact ? '10px' : '12px';
+  
+  // Lebar kolom label (untuk titik dua sejajar)
+  const labelWidth = compact ? '48px' : '58px';
+  
+  // Helper untuk baris biodata
+  const row = (label, value, isBig = false) => `
+    <div style="display:grid;grid-template-columns:${labelWidth} 8px 1fr;align-items:baseline;gap:0;line-height:1.2;">
+      <span style="font-size:${labelSize};font-weight:800;color:#059669;text-align:left;">${label}</span>
+      <span style="font-size:${isBig ? nameSize : valueSize};font-weight:700;color:#059669;">:</span>
+      <span style="font-size:${isBig ? nameSize : valueSize};font-weight:${isBig ? '800' : '700'};color:${isBig ? '#047857' : '#1e293b'};word-break:break-word;">${value}</span>
+    </div>
+  `;
   
   return `
     <div style="width:${w};height:${h};background:#ffffff;border:1px solid #cbd5e1;border-left:5px solid #059669;border-radius:8px;padding:${pad};color:#1e293b;position:relative;overflow:hidden;font-family:'Plus Jakarta Sans',Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.08);box-sizing:border-box;display:flex;flex-direction:column;">
       
-      <!-- Watermark -->
       <div style="position:absolute;bottom:-20px;right:-15px;font-size:${compact?'70px':'90px'};opacity:.04;pointer-events:none;">🕌</div>
       
       <!-- KOP -->
@@ -1384,54 +1395,14 @@ function generateKartuHTML(s, compact = false) {
       <div style="display:flex;gap:${compact?'8px':'10px'};flex:1;min-height:0;">
         
         <!-- KIRI: BIODATA -->
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;">
-          
-          <div style="display:flex;flex-direction:column;gap:${compact?'2px':'3px'};">
-            
-            <!-- NAMA -->
-            <div style="display:flex;gap:4px;align-items:baseline;">
-              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">NAMA</span>
-              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.15;flex:1;word-break:break-word;">: ${namaKapital}</span>
-            </div>
-            
-            <!-- NIK -->
-            <div style="display:flex;gap:4px;align-items:baseline;">
-              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">NIK</span>
-              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;word-break:break-all;">: ${nik}</span>
-            </div>
-            
-            <!-- NO. KK -->
-            <div style="display:flex;gap:4px;align-items:baseline;">
-              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">NO. KK</span>
-              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;word-break:break-all;">: ${kk}</span>
-            </div>
-            
-            <!-- TTL -->
-            <div style="display:flex;gap:4px;align-items:baseline;">
-              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">TTL</span>
-              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;word-break:break-word;">: ${tempatKapital}, ${tglLahir}</span>
-            </div>
-            
-            <!-- JK -->
-            <div style="display:flex;gap:4px;align-items:baseline;">
-              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">JK</span>
-              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;">: ${jkText}</span>
-            </div>
-            
-            <!-- KAMAR -->
-            <div style="display:flex;gap:4px;align-items:baseline;">
-              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">KAMAR</span>
-              <span style="font-size:${valueSize};font-weight:700;color:#1e293b;flex:1;">: ${kamarKapital}</span>
-            </div>
-            
-            <!-- WALI -->
-            <div style="display:flex;gap:4px;align-items:baseline;">
-              <span style="min-width:${compact?'42px':'50px'};font-size:${labelSize};font-weight:800;color:#059669;">WALI</span>
-              <span style="font-size:${nameSize};font-weight:800;color:#047857;line-height:1.15;flex:1;word-break:break-word;">: ${waliKapital}</span>
-            </div>
-            
-          </div>
-          
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:${compact?'2px':'3px'};">
+          ${row('NAMA', namaKapital, true)}
+          ${row('NIK', nik)}
+          ${row('NO. KK', kk)}
+          ${row('TTL', `${tempatKapital}, ${tglLahir}`)}
+          ${row('JK', jkText)}
+          ${row('KAMAR', kamarKapital)}
+          ${row('WALI', waliKapital, true)}
         </div>
         
         <!-- KANAN: FOTO 3x4 -->
@@ -1452,8 +1423,7 @@ function generateKartuHTML(s, compact = false) {
       
     </div>
   `;
-}
-function cetakKartuId(santriId){
+}function cetakKartuId(santriId){
   const s=santriList.find(x=>x.id===santriId);if(!s){showToast('Santri tidak ditemukan','error');return}
   const win=window.open('','','width=800,height=600');
   win.document.write(`<!DOCTYPE html><html><head><title>Kartu - ${s.nama}</title>
