@@ -363,8 +363,13 @@ tbody tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <div class="nav-section">Keuangan</div>
-      <div class="nav-parent" id="navKeuanganParent">
+          <!-- MENU SANTRI — SALDO & RIWAYAT -->
+      <div class="nav-section santri-only hidden">Keuangan Saya</div>
+      <div class="nav-item santri-only hidden" data-page="saldo-saya"><span class="ico">💎</span> Saldo Sekarang</div>
+      <div class="nav-item santri-only hidden" data-page="riwayat-saya"><span class="ico">📜</span> Riwayat Transaksi Saya</div>
+
+      <div class="nav-section admin-only">Keuangan</div>
+      <div class="nav-parent admin-only" id="navKeuanganParent">
         <div class="nav-item" onclick="toggleSubmenu('navKeuanganParent')">
           <span class="ico">💰</span> Keuangan
           <span class="arrow">▶</span>
@@ -567,6 +572,37 @@ tbody tr:last-child td{border-bottom:none}
           </div>
         </div>
       </div>
+            <!-- ============ SALDO SAYA (SANTRI) ============ -->
+      <div class="page" id="page-saldo-saya">
+        <div class="page-header">
+          <h2>💎 Saldo Saya</h2>
+          <p>Saldo tabungan pribadi Anda</p>
+        </div>
+        <div id="saldoSayaContent"></div>
+      </div>
+
+      <!-- ============ RIWAYAT SAYA (SANTRI) ============ -->
+      <div class="page" id="page-riwayat-saya">
+        <div class="page-header">
+          <h2>📜 Riwayat Transaksi Saya</h2>
+          <p>Semua transaksi keuangan Anda</p>
+        </div>
+        <div class="card">
+          <div class="filter-bar">
+            <div class="form-field">
+              <label>Jenis</label>
+              <select id="filterJenisSaya" onchange="renderRiwayatSaya()">
+                <option value="">Semua</option>
+                <option value="masuk">📥 Setoran</option>
+                <option value="keluar">📤 Pengeluaran</option>
+              </select>
+            </div>
+            <div class="form-field"><label>Dari Tanggal</label><input type="date" id="filterDariSaya" onchange="renderRiwayatSaya()"></div>
+            <div class="form-field"><label>Sampai Tanggal</label><input type="date" id="filterSampaiSaya" onchange="renderRiwayatSaya()"></div>
+          </div>
+          <div id="riwayatSayaTable"></div>
+        </div>
+      </div>
 
       <!-- ============ DATA SANTRI ============ -->
       <div class="page" id="page-santri">
@@ -590,12 +626,18 @@ tbody tr:last-child td{border-bottom:none}
         <div class="card">
           <div class="card-header"><div class="card-title">📋 Daftar Santri</div></div>
           <div class="filter-bar">
-            <div class="form-field"><label>Cari Santri</label><input id="cariSantri" placeholder="Ketik nama..." oninput="renderSantri()"></div>
-            <div class="form-field"><label>Filter Kamar</label><select id="filterKamar" onchange="renderSantri()"><option value="">Semua Kamar</option></select></div>
-          </div>
-          <div id="santriTable"></div>
-        </div>
-      </div>
+  <div class="form-field"><label>Cari Santri</label><input id="cariSantri" placeholder="Ketik nama..." oninput="renderSantri()"></div>
+  <div class="form-field"><label>Filter Kamar</label><select id="filterKamar" onchange="renderSantri()"><option value="">Semua Kamar</option></select></div>
+  <div class="form-field">
+    <label>Filter Tabungan</label>
+    <select id="filterTabungan" onchange="renderSantri()">
+      <option value="default">💰 Hanya yang punya tabungan</option>
+      <option value="ada">💰 Punya Tabungan</option>
+      <option value="tidak">❌ Tanpa Tabungan</option>
+      <option value="">Semua Santri</option>
+    </select>
+  </div>
+</div>
 
       <!-- ============ KAMAR ASRAMA ============ -->
       <div class="page" id="page-kamar">
@@ -1138,6 +1180,8 @@ auth.onAuthStateChanged(async (user) => {
 
 function applyRoleUI() {
   document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isAdmin));
+  document.querySelectorAll('.santri-only').forEach(el => el.classList.toggle('hidden', isAdmin));
+  
   const avatar = document.getElementById('userAvatar');
   const initial = (userProfile.nama || 'U').charAt(0).toUpperCase();
   avatar.textContent = initial;
@@ -1145,7 +1189,19 @@ function applyRoleUI() {
   document.getElementById('userNameDisplay').innerHTML = `${userProfile.nama || 'User'}<small id="userRoleLabel">${isAdmin ? 'Administrator' : 'Santri'}</small>`;
   document.getElementById('ddName').textContent = userProfile.nama || 'User';
   document.getElementById('ddRole').textContent = isAdmin ? 'Administrator' : 'Santri';
-  if (!isAdmin) document.getElementById('heroWelcome').classList.add('santri');
+  
+  if (!isAdmin) {
+    document.getElementById('heroWelcome').classList.add('santri');
+    // Redirect ke halaman saldo saya
+    setTimeout(() => {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      const target = document.querySelector('.nav-item[data-page="saldo-saya"]');
+      if (target) target.classList.add('active');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const pg = document.getElementById('page-saldo-saya');
+      if (pg) pg.classList.add('active');
+    }, 300);
+  }
 }
 
 /* ============================================================
@@ -1167,68 +1223,114 @@ function setupListeners() {
     loadPengaturan();
   }, err => console.warn('pengaturan:', err)));
 
-  unsubscribeListeners.push(db.collection('santri').onSnapshot(snap => {
-    santriList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    refreshAll();
-  }, err => console.warn('santri:', err)));
-
-  unsubscribeListeners.push(db.collection('transaksi').onSnapshot(snap => {
-    transaksiList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    refreshAll();
-  }, err => console.warn('transaksi:', err)));
-
-  unsubscribeListeners.push(db.collection('kamar').onSnapshot(snap => {
-    kamarList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderKamar();
-    refreshAll();
-  }, err => console.warn('kamar:', err)));
-
-  unsubscribeListeners.push(db.collection('piket').onSnapshot(snap => {
-    piketList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderPiket();
-    renderPiketHariIni();
-    renderRekapPiket();
-    refreshAll();
-  }, err => console.warn('piket:', err)));
-
-  unsubscribeListeners.push(db.collection('tugas').onSnapshot(snap => {
-    tugasList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderTugas();
-  }, err => console.warn('tugas:', err)));
-
-  unsubscribeListeners.push(db.collection('tatib').onSnapshot(snap => {
-    tatibList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderTatib();
-    refreshPelanggaranDropdown();
-  }, err => console.warn('tatib:', err)));
-
-  unsubscribeListeners.push(db.collection('pelanggaran').onSnapshot(snap => {
-    pelanggaranList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderPelanggaran();
-    renderDashboard();
-  }, err => console.warn('pelanggaran:', err)));
-
-  unsubscribeListeners.push(db.collection('kegiatan').onSnapshot(snap => {
-    kegiatanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderKegiatan();
-    renderDashboard();
-  }, err => console.warn('kegiatan:', err)));
-
-  unsubscribeListeners.push(db.collection('pengumuman').onSnapshot(snap => {
-    pengumumanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderPengumuman();
-    renderDashboard();
-    updateBadgePengumuman();
-  }, err => console.warn('pengumuman:', err)));
-
   if (isAdmin) {
+    // ============ ADMIN: Akses semua data ============
+    unsubscribeListeners.push(db.collection('santri').onSnapshot(snap => {
+      santriList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      refreshAll();
+    }, err => console.warn('santri:', err)));
+
+    unsubscribeListeners.push(db.collection('transaksi').onSnapshot(snap => {
+      transaksiList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      refreshAll();
+    }, err => console.warn('transaksi:', err)));
+
+    unsubscribeListeners.push(db.collection('kamar').onSnapshot(snap => {
+      kamarList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderKamar();
+      refreshAll();
+    }, err => console.warn('kamar:', err)));
+
+    unsubscribeListeners.push(db.collection('piket').onSnapshot(snap => {
+      piketList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPiket();
+      renderPiketHariIni();
+      renderRekapPiket();
+      refreshAll();
+    }, err => console.warn('piket:', err)));
+
+    unsubscribeListeners.push(db.collection('tugas').onSnapshot(snap => {
+      tugasList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderTugas();
+    }, err => console.warn('tugas:', err)));
+
+    unsubscribeListeners.push(db.collection('tatib').onSnapshot(snap => {
+      tatibList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderTatib();
+      refreshPelanggaranDropdown();
+    }, err => console.warn('tatib:', err)));
+
+    unsubscribeListeners.push(db.collection('pelanggaran').onSnapshot(snap => {
+      pelanggaranList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPelanggaran();
+      renderDashboard();
+    }, err => console.warn('pelanggaran:', err)));
+
+    unsubscribeListeners.push(db.collection('kegiatan').onSnapshot(snap => {
+      kegiatanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderKegiatan();
+      renderDashboard();
+    }, err => console.warn('kegiatan:', err)));
+
+    unsubscribeListeners.push(db.collection('pengumuman').onSnapshot(snap => {
+      pengumumanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPengumuman();
+      renderDashboard();
+      updateBadgePengumuman();
+    }, err => console.warn('pengumuman:', err)));
+
     unsubscribeListeners.push(db.collection('users').onSnapshot(snap => {
       usersList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderUsers();
     }, err => console.warn('users:', err)));
+    
+  } else {
+    // ============ SANTRI: Hanya data pribadi ============
+    const mySantriId = userProfile?.santriId;
+    
+    // Ambil data santri sendiri saja
+    if (mySantriId) {
+      unsubscribeListeners.push(db.collection('santri').doc(mySantriId).onSnapshot(doc => {
+        if (doc.exists) {
+          santriList = [{ id: doc.id, ...doc.data() }];
+        } else {
+          santriList = [];
+        }
+        renderSaldoSaya();
+        renderRiwayatSaya();
+      }, err => console.warn('santri saya:', err)));
+      
+      // Ambil transaksi milik sendiri saja
+      unsubscribeListeners.push(db.collection('transaksi')
+        .where('santriId', '==', mySantriId)
+        .onSnapshot(snap => {
+          transaksiList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderSaldoSaya();
+          renderRiwayatSaya();
+        }, err => console.warn('transaksi saya:', err)));
+      
+      // Ambil pelanggaran sendiri
+      unsubscribeListeners.push(db.collection('pelanggaran')
+        .where('santriId', '==', mySantriId)
+        .onSnapshot(snap => {
+          pelanggaranList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderSaldoSaya();
+        }, err => console.warn('pelanggaran saya:', err)));
+    }
+    
+    // Info umum (kegiatan & pengumuman) — semua boleh lihat
+    unsubscribeListeners.push(db.collection('kegiatan').onSnapshot(snap => {
+      kegiatanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderKegiatan();
+    }, err => console.warn('kegiatan:', err)));
+
+    unsubscribeListeners.push(db.collection('pengumuman').onSnapshot(snap => {
+      pengumumanList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPengumuman();
+      updateBadgePengumuman();
+    }, err => console.warn('pengumuman:', err)));
   }
 }
-
 /* ============================================================
    🎨 UTILS
 ============================================================ */
@@ -1292,6 +1394,8 @@ function goToPage(page) {
   if (pg) pg.classList.add('active');
   if (window.innerWidth <= 900) toggleSidebar();
   if (isAdmin) refreshAll();
+  else if (page === 'saldo-saya') renderSaldoSaya();
+  else if (page === 'riwayat-saya') renderRiwayatSaya();
   window.scrollTo({top:0, behavior:'smooth'});
   document.getElementById('userDropdown').classList.remove('show');
 }
@@ -1926,6 +2030,166 @@ async function hapusUser(uid, username) {
     showToast('User dihapus');
   } catch (err) { showToast('Gagal menghapus', 'error'); }
 }
+      /* ============================================================
+   💎 RENDER — SALDO SAYA (SANTRI)
+============================================================ */
+function renderSaldoSaya() {
+  const el = document.getElementById('saldoSayaContent'); if (!el) return;
+  
+  // Cari data santri milik user ini
+  const mySantriId = userProfile?.santriId;
+  let myData = mySantriId ? santriList.find(s => s.id === mySantriId) : null;
+  
+  // Fallback: cari berdasarkan nama
+  if (!myData && userProfile?.nama) {
+    myData = santriList.find(s => s.nama.toLowerCase() === userProfile.nama.toLowerCase());
+  }
+  
+  if (!myData) {
+    el.innerHTML = `<div class="card"><div class="empty">
+      <div class="empty-icon">💎</div>
+      <p>Akun Anda belum dikaitkan dengan data santri.</p>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Hubungi admin untuk mengaitkan akun dengan data santri.</p>
+    </div></div>`;
+    return;
+  }
+  
+  const saldo = hitungSaldo(myData.id);
+  const trx = transaksiList.filter(t => t.santriId === myData.id);
+  const masuk = trx.filter(t => t.jenis === 'masuk').reduce((a,b) => a + b.jumlah, 0);
+  const keluar = trx.filter(t => t.jenis === 'keluar').reduce((a,b) => a + b.jumlah, 0);
+  const lastTrx = trx.length > 0 ? trx.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0] : null;
+  
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:20px;padding:32px;color:white;box-shadow:0 12px 40px rgba(59,130,246,.35);position:relative;overflow:hidden;margin-bottom:24px;">
+      <div style="position:absolute;top:-40%;right:-10%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);"></div>
+      <div style="position:relative;z-index:1;">
+        <div style="font-size:12px;opacity:.8;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">💰 Saldo Tabungan Saya</div>
+        <div style="font-size:46px;font-weight:800;letter-spacing:-1.5px;margin-bottom:24px;line-height:1;">${rupiah(saldo)}</div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:11px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Total Setoran</div>
+            <div style="font-size:18px;font-weight:700;margin-top:4px;">${rupiah(masuk)}</div>
+          </div>
+          <div>
+            <div style="font-size:11px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Total Pengeluaran</div>
+            <div style="font-size:18px;font-weight:700;margin-top:4px;">${rupiah(keluar)}</div>
+          </div>
+          <div>
+            <div style="font-size:11px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Total Transaksi</div>
+            <div style="font-size:18px;font-weight:700;margin-top:4px;">${trx.length} kali</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-top"><div class="stat-icon">👤</div></div>
+        <div class="stat-label">Nama Santri</div>
+        <div class="stat-value" style="font-size:16px;">${myData.nama}</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-top"><div class="stat-icon">🏠</div></div>
+        <div class="stat-label">Kamar</div>
+        <div class="stat-value" style="font-size:16px;">${myData.kamar || '-'}</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-top"><div class="stat-icon">📍</div></div>
+        <div class="stat-label">Asal Daerah</div>
+        <div class="stat-value" style="font-size:16px;">${myData.asal || '-'}</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-top"><div class="stat-icon">⚠️</div></div>
+        <div class="stat-label">Poin Pelanggaran</div>
+        <div class="stat-value" style="font-size:16px;">${hitungPoinSantri(myData.id)}</div>
+      </div>
+    </div>
+    
+    ${lastTrx ? `
+    <div class="card">
+      <div class="card-header"><div class="card-title">🕐 Transaksi Terakhir</div></div>
+      <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg);border-radius:12px;">
+        <div style="width:52px;height:52px;border-radius:12px;background:${lastTrx.jenis === 'masuk' ? 'rgba(16,185,129,.15)' : 'rgba(239,68,68,.15)'};display:flex;align-items:center;justify-content:center;font-size:22px;">
+          ${lastTrx.jenis === 'masuk' ? '📥' : '📤'}
+        </div>
+        <div style="flex:1;">
+          <strong style="display:block;font-size:14px;margin-bottom:4px;">${lastTrx.kategori || 'Transaksi'}</strong>
+          <small style="font-size:12px;color:var(--text-muted);">${lastTrx.ket || 'Tanpa keterangan'} · ${new Date(lastTrx.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</small>
+        </div>
+        <div style="font-size:18px;font-weight:800;" class="${lastTrx.jenis === 'masuk' ? 'text-positif' : 'text-negatif'}">
+          ${lastTrx.jenis === 'masuk' ? '+' : '-'}${rupiah(lastTrx.jumlah)}
+        </div>
+      </div>
+      <button class="btn btn-info btn-sm" style="margin-top:12px;" onclick="goToPage('riwayat-saya')">Lihat Semua Riwayat →</button>
+    </div>
+    ` : `
+    <div class="card">
+      <div class="empty"><div class="empty-icon">📭</div><p>Belum ada transaksi</p></div>
+    </div>
+    `}
+  `;
+}
+
+/* ============================================================
+   📜 RENDER — RIWAYAT SAYA (SANTRI)
+============================================================ */
+function renderRiwayatSaya() {
+  const el = document.getElementById('riwayatSayaTable'); if (!el) return;
+  
+  const mySantriId = userProfile?.santriId;
+  let myData = mySantriId ? santriList.find(s => s.id === mySantriId) : null;
+  if (!myData && userProfile?.nama) {
+    myData = santriList.find(s => s.nama.toLowerCase() === userProfile.nama.toLowerCase());
+  }
+  
+  if (!myData) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">💎</div><p>Akun Anda belum dikaitkan dengan data santri</p></div>`;
+    return;
+  }
+  
+  const fj = document.getElementById('filterJenisSaya')?.value;
+  const fd = document.getElementById('filterDariSaya')?.value;
+  const fs = document.getElementById('filterSampaiSaya')?.value;
+  
+  let data = transaksiList.filter(t => t.santriId === myData.id);
+  if (fj) data = data.filter(t => t.jenis === fj);
+  if (fd) data = data.filter(t => t.tanggal >= fd);
+  if (fs) data = data.filter(t => t.tanggal <= fs);
+  data.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+  
+  if (data.length === 0) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>Belum ada transaksi</p></div>`;
+    return;
+  }
+  
+  // Hitung total untuk display
+  const totalMasuk = data.filter(t => t.jenis === 'masuk').reduce((a,b) => a + b.jumlah, 0);
+  const totalKeluar = data.filter(t => t.jenis === 'keluar').reduce((a,b) => a + b.jumlah, 0);
+  
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="padding:14px;background:rgba(16,185,129,.08);border-radius:10px;border-left:3px solid var(--primary);">
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Total Masuk</div>
+        <div style="font-size:18px;font-weight:800;color:var(--primary);margin-top:4px;">${rupiah(totalMasuk)}</div>
+      </div>
+      <div style="padding:14px;background:rgba(239,68,68,.08);border-radius:10px;border-left:3px solid var(--danger);">
+        <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;">Total Keluar</div>
+        <div style="font-size:18px;font-weight:800;color:var(--danger);margin-top:4px;">${rupiah(totalKeluar)}</div>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Kategori</th><th>Keterangan</th></tr></thead>
+      <tbody>${data.map(t => `<tr>
+        <td>${new Date(t.tanggal).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</td>
+        <td><span class="badge badge-${t.jenis}">${t.jenis === 'masuk' ? '📥 Masuk' : '📤 Keluar'}</span></td>
+        <td class="${t.jenis === 'masuk' ? 'text-positif' : 'text-negatif'}">${t.jenis === 'masuk' ? '+' : '-'} ${rupiah(t.jumlah)}</td>
+        <td>${t.kategori || '-'}</td>
+        <td>${t.ket || '-'}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  `;
+}
 </script>
 
     <script>
@@ -1935,16 +2199,33 @@ async function hapusUser(uid, username) {
 function renderSantri() {
   const cari = (document.getElementById('cariSantri')?.value || '').toLowerCase();
   const filterKamarVal = document.getElementById('filterKamar')?.value || '';
+  const filterTabungan = document.getElementById('filterTabungan')?.value || '';
+  
   let data = santriList.filter(s => s.nama.toLowerCase().includes(cari));
   if (filterKamarVal) data = data.filter(s => s.kamar === filterKamarVal);
+  
+  // Filter berdasarkan punya tabungan / tidak
+  if (filterTabungan === 'ada') {
+    data = data.filter(s => hitungSaldo(s.id) !== 0 || transaksiList.some(t => t.santriId === s.id));
+  } else if (filterTabungan === 'tidak') {
+    data = data.filter(s => hitungSaldo(s.id) === 0 && !transaksiList.some(t => t.santriId === s.id));
+  } else if (filterTabungan === 'default') {
+    // Default: sembunyikan yang tidak ada tabungan sama sekali
+    data = data.filter(s => hitungSaldo(s.id) !== 0 || transaksiList.some(t => t.santriId === s.id));
+  }
+  
   const el = document.getElementById('santriTable'); if (!el) return;
-  if (data.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><p>Belum ada santri</p></div>`; return; }
+  if (data.length === 0) { 
+    el.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><p>Belum ada santri yang ditampilkan</p></div>`; 
+    return; 
+  }
+  
   el.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>No</th><th>Nama</th><th>Kamar</th><th>No. HP Wali</th><th>Saldo</th><th>Poin</th>${isAdmin?'<th>Aksi</th>':''}</tr></thead>
+    <thead><tr><th>No</th><th>Nama</th><th>Kamar</th><th>No. HP Wali</th><th>Saldo</th><th>Poin</th><th>Aksi</th></tr></thead>
     <tbody>${data.map((s, i) => {
       const saldo = hitungSaldo(s.id);
       const poin = hitungPoinSantri(s.id);
-      const poinClass = poin > 100 ? 'text-negatif' : poin > 50 ? 'text-negatif' : poin > 20 ? 'text-negatif' : 'text-positif';
+      const poinClass = poin > 50 ? 'text-negatif' : poin > 20 ? 'text-negatif' : poin > 0 ? 'text-negatif' : 'text-positif';
       return `<tr>
         <td>${i+1}</td>
         <td><strong>${s.nama}</strong>${s.asal ? `<br><small style="color:var(--text-muted)">${s.asal}</small>` : ''}</td>
@@ -1952,10 +2233,10 @@ function renderSantri() {
         <td>${s.hp || '-'}</td>
         <td class="${saldo>=0?'text-positif':'text-negatif'}">${rupiah(saldo)}</td>
         <td class="${poinClass}">${poin > 0 ? '⚠️ '+poin : '✅ 0'}</td>
-        ${isAdmin?`<td><div style="display:flex;gap:6px;">
+        <td><div style="display:flex;gap:6px;">
           <button class="btn btn-warning btn-sm btn-icon" onclick="editSantri('${s.id}')">✏️</button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="hapusSantri('${s.id}')">🗑️</button>
-        </div></td>`:''}
+        </div></td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>`;
@@ -2652,7 +2933,16 @@ function renderDashboard() {
    🔄 REFRESH ALL
 ============================================================ */
 function refreshAll() {
-  if (!isAdmin) return;
+  if (!isAdmin) {
+    // Untuk santri: hanya render halaman milik sendiri
+    if (document.getElementById('page-saldo-saya')?.classList.contains('active')) {
+      renderSaldoSaya();
+    }
+    if (document.getElementById('page-riwayat-saya')?.classList.contains('active')) {
+      renderRiwayatSaya();
+    }
+    return;
+  }
   
   const opts = santriList.map(s => `<option value="${s.id}">${s.nama}${s.kamar?' - '+s.kamar:''}</option>`).join('');
   ['setorSantri','keluarSantri','piketPetugas1','piketPetugas2','newUserSantriId','pelanggaranSantri','filterPelanggaranSantri'].forEach(id => {
@@ -2692,7 +2982,6 @@ function refreshAll() {
   const bulanRekap = document.getElementById('filterRekapBulan');
   if (bulanRekap && !bulanRekap.value) bulanRekap.value = today().substring(0,7);
 }
-
 function globalSearchHandler() {
   const q = document.getElementById('globalSearch').value.toLowerCase();
   if (!q) return;
