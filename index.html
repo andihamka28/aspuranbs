@@ -488,7 +488,12 @@ tbody tr:last-child td{border-bottom:none}
             <div class="form-field"><label>Tempat Lahir</label><input id="santriTempatLahir" placeholder="Contoh: Bandung"></div>
             <div class="form-field"><label>Tanggal Lahir</label><input type="date" id="santriTglLahir"></div>
             <div class="form-field"><label>Jenis Kelamin</label><select id="santriJK"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
-            <div class="form-field"><label>Kamar / Asrama</label><input id="santriKamar" placeholder="Contoh: Kamar A-01"></div>
+            <div class="form-field">
+  <label>Kamar / Asrama</label>
+  <select id="santriKamar">
+    <option value="">-- Pilih Kamar --</option>
+  </select>
+</div>
             <div class="form-field"><label>Asal Daerah</label><input id="santriAsal" placeholder="Contoh: Bandung"></div>
             <div class="form-field" style="grid-column:1/-1;"><label>Alamat Lengkap</label><input id="santriAlamat" placeholder="Jl. Contoh No. 123, RT/RW, Kel, Kec, Kota"></div>
             <div class="form-field"><label>Nama Wali</label><input id="santriWali" placeholder="Nama orang tua/wali"></div>
@@ -1022,7 +1027,20 @@ function editSantri(id){
   document.getElementById('santriEditId').value=s.id;
   setVal('santriNama',s.nama);setVal('santriNIK',s.nik);setVal('santriKK',s.kk);
   setVal('santriTempatLahir',s.tempatLahir);setVal('santriTglLahir',s.tglLahir);
-  setVal('santriJK',s.jk||'L');setVal('santriKamar',s.kamar);setVal('santriAsal',s.asal);
+  setVal('santriJK',s.jk||'L');
+  // Kamar: pastikan value-nya ada di dropdown
+  const kamarSelect=document.getElementById('santriKamar');
+  if(kamarSelect){
+    // Kalau kamar santri belum ada di dropdown, tambahkan dulu
+    const exists=[...kamarSelect.options].some(o=>o.value===s.kamar);
+    if(!exists&&s.kamar){
+      const opt=document.createElement('option');
+      opt.value=s.kamar;opt.textContent=s.kamar+' (tidak terdaftar)';
+      kamarSelect.appendChild(opt);
+    }
+    kamarSelect.value=s.kamar||'';
+  }
+  setVal('santriAsal',s.asal);
   setVal('santriAlamat',s.alamat);setVal('santriWali',s.wali);setVal('santriHP',s.hp);setVal('santriTgl',s.tgl);
   document.getElementById('formSantriTitle').textContent='✏️ Edit Santri';
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1030,10 +1048,12 @@ function editSantri(id){
 function hapusSantri(id){if(!confirm('Hapus santri ini?'))return;db.collection('santri').doc(id).delete().then(()=>showToast('Santri dihapus')).catch(err=>showToast('Gagal','error'))}
 function resetFormSantri(){
   const clear=(i)=>{const el=document.getElementById(i);if(el)el.value=''};
-  ['santriEditId','santriNama','santriNIK','santriKK','santriTempatLahir','santriTglLahir','santriKamar','santriAsal','santriAlamat','santriWali','santriHP'].forEach(clear);
+  ['santriEditId','santriNama','santriNIK','santriKK','santriTempatLahir','santriTglLahir','santriAsal','santriAlamat','santriWali','santriHP'].forEach(clear);
   document.getElementById('santriJK').value='L';
+  document.getElementById('santriKamar').value='';
   document.getElementById('santriTgl').value=today();
   document.getElementById('formSantriTitle').textContent='➕ Tambah Santri';
+}
 }
 
 /* ============ KAMAR CRUD ============ */
@@ -2131,6 +2151,14 @@ function refreshAll(){
   const kamarOpts=[...new Set(santriList.map(s=>s.kamar).filter(Boolean))].map(k=>`<option value="${k}">${k}</option>`).join('');
   const fK=document.getElementById('filterKamar');
   if(fK)fK.innerHTML='<option value="">Semua Kamar</option>'+kamarOpts;
+  // Isi dropdown kamar di form Santri
+const kamarSelect=document.getElementById('santriKamar');
+if(kamarSelect){
+  const cur=kamarSelect.value;
+  kamarSelect.innerHTML='<option value="">-- Pilih Kamar --</option>'+
+    kamarList.sort((a,b)=>a.nama.localeCompare(b.nama)).map(k=>`<option value="${k.nama}">${k.nama}${k.gedung?' - '+k.gedung:''}</option>`).join('');
+  if(cur)kamarSelect.value=cur;
+}
   const cetakKamar=document.getElementById('cetakFilterKamar');
   if(cetakKamar){const cur=cetakKamar.value;cetakKamar.innerHTML='<option value="">Semua Kamar</option>'+kamarOpts;if(cur)cetakKamar.value=cur}
   const pilihCetak=document.getElementById('pilihCetakId');
