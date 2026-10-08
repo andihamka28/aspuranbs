@@ -305,6 +305,7 @@ tbody tr:last-child td{border-bottom:none}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
 .sidebar-overlay.show{display:block}
 </style>
+</head>
 
   <body>
 
@@ -447,13 +448,13 @@ tbody tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <!-- SALDO SAYA -->
+      <!-- SALDO SAYA (SANTRI) -->
       <div class="page santri-only hidden" id="page-saldo-saya">
         <div class="page-header"><h2>💎 Saldo Sekarang</h2><p>Saldo tabungan pribadi Anda</p></div>
         <div id="saldoSayaContent"></div>
       </div>
 
-      <!-- RIWAYAT SAYA -->
+      <!-- RIWAYAT SAYA (SANTRI) -->
       <div class="page santri-only hidden" id="page-riwayat-saya">
         <div class="page-header"><h2>📜 Riwayat Transaksi Saya</h2><p>Semua transaksi keuangan Anda</p></div>
         <div class="card">
@@ -466,7 +467,7 @@ tbody tr:last-child td{border-bottom:none}
         </div>
       </div>
 
-      <!-- KARTU IDENTITAS SAYA -->
+      <!-- KARTU IDENTITAS SAYA (SANTRI) -->
       <div class="page santri-only hidden" id="page-cetak-id-saya">
         <div class="page-header"><h2>🪪 Kartu Identitas Saya</h2><p>Kartu identitas digital Anda</p></div>
         <div class="card">
@@ -488,12 +489,7 @@ tbody tr:last-child td{border-bottom:none}
             <div class="form-field"><label>Tempat Lahir</label><input id="santriTempatLahir" placeholder="Contoh: Bandung"></div>
             <div class="form-field"><label>Tanggal Lahir</label><input type="date" id="santriTglLahir"></div>
             <div class="form-field"><label>Jenis Kelamin</label><select id="santriJK"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
-            <div class="form-field">
-  <label>Kamar / Asrama</label>
-  <select id="santriKamar">
-    <option value="">-- Pilih Kamar --</option>
-  </select>
-</div>
+            <div class="form-field"><label>Kamar / Asrama</label><select id="santriKamar"><option value="">-- Pilih Kamar --</option></select></div>
             <div class="form-field"><label>Asal Daerah</label><input id="santriAsal" placeholder="Contoh: Bandung"></div>
             <div class="form-field" style="grid-column:1/-1;"><label>Alamat Lengkap</label><input id="santriAlamat" placeholder="Jl. Contoh No. 123, RT/RW, Kel, Kec, Kota"></div>
             <div class="form-field"><label>Nama Wali</label><input id="santriWali" placeholder="Nama orang tua/wali"></div>
@@ -1010,7 +1006,7 @@ function simpanSantri(){
     tempatLahir:document.getElementById('santriTempatLahir').value.trim(),
     tglLahir:document.getElementById('santriTglLahir').value,
     jk:document.getElementById('santriJK').value,
-    kamar:document.getElementById('santriKamar').value.trim(),
+    kamar:document.getElementById('santriKamar').value,
     asal:document.getElementById('santriAsal').value.trim(),
     alamat:document.getElementById('santriAlamat').value.trim(),
     wali:document.getElementById('santriWali').value.trim(),
@@ -1031,7 +1027,6 @@ function editSantri(id){
   // Kamar: pastikan value-nya ada di dropdown
   const kamarSelect=document.getElementById('santriKamar');
   if(kamarSelect){
-    // Kalau kamar santri belum ada di dropdown, tambahkan dulu
     const exists=[...kamarSelect.options].some(o=>o.value===s.kamar);
     if(!exists&&s.kamar){
       const opt=document.createElement('option');
@@ -1053,7 +1048,6 @@ function resetFormSantri(){
   document.getElementById('santriKamar').value='';
   document.getElementById('santriTgl').value=today();
   document.getElementById('formSantriTitle').textContent='➕ Tambah Santri';
-}
 }
 
 /* ============ KAMAR CRUD ============ */
@@ -1259,7 +1253,7 @@ function loadPengaturan(){
 }
 
 async function backupData(){
-  const data={santriList,transaksiList,kegiatanList,pengumumanList,piketList,tugasList,tatibList,pelanggaranList,kamarList,pengaturan,exportedAt:new Date().toISOString(),version:11};
+  const data={santriList,transaksiList,kegiatanList,pengumumanList,piketList,tugasList,tatibList,pelanggaranList,kamarList,pengaturan,exportedAt:new Date().toISOString(),version:12};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`backup-asrama-${today()}.json`;a.click();
   showToast('Backup didownload');
@@ -1364,25 +1358,20 @@ function generateKartuHTML(s, compact = false) {
   const nik = s.nik || '-';
   const kk = s.kk || '-';
   
-  // Ukuran kartu
   const w = compact ? '9cm' : '10cm';
   const h = compact ? '5.8cm' : '6.5cm';
   const pad = compact ? '8px 10px' : '10px 14px';
   const fotoW = compact ? '62px' : '72px';
   const fotoH = compact ? '82px' : '96px';
   
-  // Font sizes
   const kopTitleSize = compact ? '11px' : '13px';
   const kopSubSize   = compact ? '7.5px' : '9px';
   const judulSize    = compact ? '7px' : '8px';
   const labelSize    = compact ? '8px' : '10px';
   const valueSize    = compact ? '9px' : '11px';
   const nameSize     = compact ? '10px' : '12px';
+  const labelWidth   = compact ? '48px' : '58px';
   
-  // Lebar kolom label (untuk titik dua sejajar)
-  const labelWidth = compact ? '48px' : '58px';
-  
-  // Helper untuk baris biodata
   const row = (label, value, isBig = false) => `
     <div style="display:grid;grid-template-columns:${labelWidth} 8px 1fr;align-items:baseline;gap:0;line-height:1.2;">
       <span style="font-size:${labelSize};font-weight:800;color:#059669;text-align:left;">${label}</span>
@@ -1396,7 +1385,6 @@ function generateKartuHTML(s, compact = false) {
       
       <div style="position:absolute;bottom:-20px;right:-15px;font-size:${compact?'70px':'90px'};opacity:.04;pointer-events:none;">🕌</div>
       
-      <!-- KOP -->
       <div style="display:flex;align-items:center;gap:6px;padding-bottom:4px;border-bottom:1.5px solid #059669;margin-bottom:3px;">
         <div style="width:${compact?'24px':'28px'};height:${compact?'24px':'28px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'13px':'15px'};flex-shrink:0;color:white;box-shadow:0 2px 4px rgba(5,150,105,.3);">🕌</div>
         <div style="flex:1;text-align:center;line-height:1.1;">
@@ -1406,15 +1394,11 @@ function generateKartuHTML(s, compact = false) {
         <div style="width:${compact?'24px':'28px'};height:${compact?'24px':'28px'};background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${compact?'12px':'14px'};flex-shrink:0;color:white;">📖</div>
       </div>
       
-      <!-- JUDUL KARTU -->
       <div style="text-align:center;font-size:${judulSize};font-weight:700;color:#059669;letter-spacing:1.5px;padding:2px 0 4px;text-transform:uppercase;">
         — KARTU IDENTITAS SANTRI —
       </div>
       
-      <!-- BODY -->
       <div style="display:flex;gap:${compact?'8px':'10px'};flex:1;min-height:0;">
-        
-        <!-- KIRI: BIODATA -->
         <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-start;gap:${compact?'2px':'3px'};">
           ${row('NAMA', namaKapital, true)}
           ${row('NIK', nik)}
@@ -1425,17 +1409,14 @@ function generateKartuHTML(s, compact = false) {
           ${row('WALI', waliKapital, true)}
         </div>
         
-        <!-- KANAN: FOTO 3x4 -->
         <div style="width:${fotoW};flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
           <div style="width:${fotoW};height:${fotoH};background:#f1f5f9;border:2px solid #059669;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:${compact?'30px':'36px'};color:#94a3b8;overflow:hidden;box-shadow:0 2px 6px rgba(5,150,105,.15);">
             ${s.foto ? `<img src="${s.foto}" style="width:100%;height:100%;object-fit:cover;">` : `${s.jk === 'P' ? '👩' : '👨'}`}
           </div>
           <div style="font-size:${compact?'6px':'7px'};text-align:center;margin-top:4px;color:#059669;font-weight:700;letter-spacing:.3px;">FOTO 3×4</div>
         </div>
-        
       </div>
       
-      <!-- FOOTER -->
       <div style="margin-top:4px;padding-top:4px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;font-size:${compact?'6px':'7px'};color:#64748b;font-weight:600;gap:6px;">
         <span style="white-space:nowrap;">📱 ${s.hp || '-'}</span>
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📍 ${(s.alamat || '-').substring(0, 30)}${(s.alamat || '').length > 30 ? '...' : ''}</span>
@@ -1443,7 +1424,9 @@ function generateKartuHTML(s, compact = false) {
       
     </div>
   `;
-}function cetakKartuId(santriId){
+}
+
+function cetakKartuId(santriId){
   const s=santriList.find(x=>x.id===santriId);if(!s){showToast('Santri tidak ditemukan','error');return}
   const win=window.open('','','width=800,height=600');
   win.document.write(`<!DOCTYPE html><html><head><title>Kartu - ${s.nama}</title>
@@ -2151,18 +2134,18 @@ function refreshAll(){
   const kamarOpts=[...new Set(santriList.map(s=>s.kamar).filter(Boolean))].map(k=>`<option value="${k}">${k}</option>`).join('');
   const fK=document.getElementById('filterKamar');
   if(fK)fK.innerHTML='<option value="">Semua Kamar</option>'+kamarOpts;
-  // Isi dropdown kamar di form Santri
-const kamarSelect=document.getElementById('santriKamar');
-if(kamarSelect){
-  const cur=kamarSelect.value;
-  kamarSelect.innerHTML='<option value="">-- Pilih Kamar --</option>'+
-    kamarList.sort((a,b)=>a.nama.localeCompare(b.nama)).map(k=>`<option value="${k.nama}">${k.nama}${k.gedung?' - '+k.gedung:''}</option>`).join('');
-  if(cur)kamarSelect.value=cur;
-}
   const cetakKamar=document.getElementById('cetakFilterKamar');
   if(cetakKamar){const cur=cetakKamar.value;cetakKamar.innerHTML='<option value="">Semua Kamar</option>'+kamarOpts;if(cur)cetakKamar.value=cur}
   const pilihCetak=document.getElementById('pilihCetakId');
   if(pilihCetak)pilihCetak.innerHTML='<option value="">-- Pilih Santri --</option>'+opts;
+  // Isi dropdown kamar di form Santri
+  const kamarSelect=document.getElementById('santriKamar');
+  if(kamarSelect){
+    const cur=kamarSelect.value;
+    kamarSelect.innerHTML='<option value="">-- Pilih Kamar --</option>'+
+      kamarList.sort((a,b)=>a.nama.localeCompare(b.nama)).map(k=>`<option value="${k.nama}">${k.nama}${k.gedung?' - '+k.gedung:''}</option>`).join('');
+    if(cur)kamarSelect.value=cur;
+  }
   renderSantri();renderKamar();renderTableTransaksi('setoranTable','masuk');renderTableTransaksi('pengeluaranTable','keluar');
   renderRiwayat();renderLaporan();renderSaldo();renderChart();renderDashboard();
   renderPiket();renderPiketHariIni();renderRekapPiket();renderTugas();renderTatib();renderPelanggaran();
@@ -2223,7 +2206,6 @@ function kirimWAPelanggaran(id){
    🎬 INIT & EVENT LISTENERS
 ============================================================ */
 window.addEventListener('load',()=>{
-  // Loading timeout safety
   setTimeout(()=>{
     if(!currentUser){
       const loading=document.getElementById('loadingOverlay');
@@ -2235,7 +2217,6 @@ window.addEventListener('load',()=>{
     }
   },5000);
   
-  // Enter key untuk submit form cepat
   document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="number"]').forEach(inp=>{
     inp.addEventListener('keydown',e=>{
       if(e.key==='Enter'&&!e.shiftKey){
@@ -2252,10 +2233,8 @@ window.addEventListener('load',()=>{
   console.log('📅 Build: '+new Date().toISOString());
 });
 
-// Prevent form submit default (semua pakai onclick)
 document.querySelectorAll('form').forEach(f=>f.addEventListener('submit',e=>e.preventDefault()));
 
-// Auto-close sidebar kalau klik di luar
 document.addEventListener('click',e=>{
   const sidebar=document.getElementById('sidebar');
   const toggle=document.querySelector('.menu-toggle');
@@ -2267,7 +2246,6 @@ document.addEventListener('click',e=>{
   }
 });
 
-// Keyboard shortcut: ESC untuk close modal/dropdown
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     document.getElementById('userDropdown')?.classList.remove('show');
@@ -2282,4 +2260,3 @@ document.addEventListener('keydown',e=>{
 </script>
 </body>
 </html>
-</head>
